@@ -1,0 +1,95 @@
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'eclipse'
+apply plugin: 'eu.appsatori.fatjar'
+
+version = '0.1'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+// Config for plugin
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'eu.appsatori:gradle-fatjar-plugin:0.3'
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+configurations {
+	compile.exclude module: 'commons-logging'
+	all*.exclude module: 'servlet-api'
+}
+
+dependencies {
+	providedCompile(
+			'javax.servlet:servlet-api:3.+',
+			)
+
+	compile(
+			'org.slf4j:slf4j-api:1.7.+',
+			'joda-time:joda-time:2.+',
+			'org.apache.commons:commons-lang3:3.3.+',
+			'org.apache.commons:commons-collections4:4.+',
+			'commons-io:commons-io:2.+',
+			'com.fasterxml.jackson.core:jackson-databind:2.4.+',
+			'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.4.+',
+			'org.hibernate:hibernate-validator:5.1.+',
+			)
+
+	compile('org.thymeleaf:thymeleaf:2.1.+',
+			'org.thymeleaf:thymeleaf-spring4:2.1.+',
+			)
+
+	compile(
+			'org.springframework:spring-context:4.1.+',
+			'org.springframework:spring-webmvc:4.1.+',
+			'org.springframework:spring-aspects:4.1.+',
+			'org.springframework:spring-jdbc:4.1.+',
+			)
+
+	compile(
+			'org.eclipse.jetty:jetty-server:9.2.+',
+			'org.eclipse.jetty:jetty-webapp:9.2.+'
+			)
+
+	runtime(
+			'ch.qos.logback:logback-classic:1.1.+',
+			'org.slf4j:jcl-over-slf4j:1.7.+',
+			)
+
+	testCompile(
+			'junit:junit:4.+',
+			'org.mockito:mockito-all:1.+',
+			'org.springframework:spring-test:4.1.+',
+			)
+
+	runtime files('lib/ojdbc7-12.1.0.jar')
+}
+
+jar {
+	manifest {
+		attributes 'Main-Class' : 'iz.oraclient.OraclientMain'
+		attributes 'Implementation-Title': 'Oraclient',
+		'Implementation-Version': version
+	}
+}
+
+fatJar {
+	manifest {
+		attributes 'Main-Class' : 'iz.oraclient.OraclientMain'
+		attributes 'Implementation-Title': 'Oraclient',
+		'Implementation-Version': version
+	}
+	classifier 'assembly'
+	exclude ('META-INF/*.DSA', '**/logback-test.xml')
+
+	destinationDir = file('./dist')
+	archiveName = 'oraclient-' + version + '.jar'
+}

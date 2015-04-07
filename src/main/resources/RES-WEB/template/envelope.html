@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:fragment="envelope">
+<head>
+<meta charset="utf-8" />
+
+<title th:text="${'Oraclient | ' + _pageTitle}"></title>
+
+<meta name="robots" content="noindex, nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0" />
+
+<!-- Icons -->
+<link rel="shortcut icon" th:href="@{/img/hekeke.ico}" />
+<link rel="apple-touch-icon" th:href="@{/lib/app-ui/img/icon57.png}" sizes="57x57" />
+<link rel="apple-touch-icon" th:href="@{/lib/app-ui/img/icon72.png}" sizes="72x72" />
+<link rel="apple-touch-icon" th:href="@{/lib/app-ui/img/icon76.png}" sizes="76x76" />
+<link rel="apple-touch-icon" th:href="@{/lib/app-ui/img/icon114.png}" sizes="114x114" />
+<link rel="apple-touch-icon" th:href="@{/lib/app-ui/img/icon120.png}" sizes="120x120" />
+<link rel="apple-touch-icon" th:href="@{/lib/app-ui/img/icon144.png}" sizes="144x144" />
+<link rel="apple-touch-icon" th:href="@{/lib/app-ui/img/icon152.png}" sizes="152x152" />
+<link rel="apple-touch-icon" th:href="@{/lib/app-ui/img/icon180.png}" sizes="180x180" />
+<!-- END Icons -->
+
+<!-- Stylesheets -->
+<link rel="stylesheet" th:href="@{/lib/app-ui/css/bootstrap.min.css}" />
+<link rel="stylesheet" th:href="@{/lib/app-ui/css/plugins.css}" />
+<link rel="stylesheet" th:href="@{/lib/app-ui/css/main.css}" />
+<link rel="stylesheet" th:href="@{/lib/app-ui/css/themes.css}" />
+<link rel="stylesheet" th:href="@{/lib/app-ui/css/themes/classy.css}" />
+<link th:substituteby="this :: link" />
+<!-- END Stylesheets -->
+
+<!-- Modernizr (browser feature detection library) -->
+<script th:src="@{/lib/app-ui/js/vendor/modernizr-2.8.3.min.js}"></script>
+</head>
+<body>
+  <!-- Page Wrapper -->
+  <div id="page-wrapper" class="page-loading">
+    <!-- Preloader -->
+    <div class="preloader">
+      <div class="inner">
+        <!-- Animation spinner for all modern browsers -->
+        <div class="preloader-spinner themed-background hidden-lt-ie10"></div>
+      </div>
+    </div>
+    <!-- END Preloader -->
+
+    <!-- Page Container -->
+    <div id="page-container" class="header-fixed-top">
+      <!-- Main Container -->
+      <div id="main-container">
+        <!-- Header -->
+        <header class="navbar navbar-inverse navbar-fixed-top">
+          <!-- Left Header Navigation -->
+          <ul class="nav navbar-nav-custom">
+            <!-- Brand -->
+            <li>
+              <div class="themed-background">
+                <a href="index.php" class="sidebar-title">
+                  <i class="fa fa-database"></i> <span class="sidebar-nav-mini-hide"><strong>Oraclient</strong></span>
+                </a>
+              </div>
+            </li>
+            <!-- END Brand -->
+            <!-- Page title -->
+            <li class="hidden-xs animation-fadeInQuick">
+              <a href="javascript:void(0)" th:text="${_pageTitle}"></a>
+            </li>
+            <!-- END Page title -->
+          </ul>
+          <!-- END Left Header Navigation -->
+
+          <!-- Right Header Navigation -->
+          <ul class="nav navbar-nav-custom pull-right">
+            <!-- Config -->
+            <li>
+              <a href="javascript:void(0)"><i class="gi gi-settings"></i></a>
+            </li>
+            <!-- END Config -->
+
+            <!-- User Dropdown -->
+            <li class="dropdown">
+              <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
+                <i class="gi gi-settings"></i>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-right">
+                <li class="dropdown-header"><strong>名前とか役割とか</strong></li>
+                <li><a href="page_app_social.html"> <i class="fa fa-pencil-square fa-fw pull-right"></i>
+                    Profile
+                </a></li>
+                <li><a href="javascript:void(0)" onclick="App.sidebar('toggle-sidebar-alt');"> <i
+                    class="gi gi-settings fa-fw pull-right"></i> Settings
+                </a></li>
+                <li class="divider"></li>
+                <li><a href="javascript:void(0)" onclick="Re_Header.logout();"> <i
+                    class="fa fa-power-off fa-fw pull-right"></i> Log out
+                </a>
+                  <form th:action="@{/page/base/header/logout}" method="post" id="re-logout" style="display: none;"></form>
+                </li>
+              </ul></li>
+            <!-- END User Dropdown -->
+          </ul>
+          <!-- END Right Header Navigation -->
+        </header>
+        <!-- END Header -->
+
+        <!-- Page content -->
+        <div id="page-content">
+          <div th:replace="this :: content"></div>
+        </div>
+        <!-- END Page Content -->
+      </div>
+      <!-- END Main Container -->
+    </div>
+    <!-- END Page Container -->
+  </div>
+  <!-- END Page Wrapper -->
+
+  <!-- Bootstrap.js, Jquery plugins and Custom JS code -->
+  <script th:src="@{/lib/app-ui/js/vendor/jquery-2.1.3.min.js}"></script>
+  <script th:src="@{/lib/app-ui/js/vendor/bootstrap.min.js}"></script>
+  <script th:src="@{/lib/app-ui/js/plugins.js}"></script>
+  <script th:src="@{/lib/app-ui/js/app.js}"></script>
+
+  <script th:src="@{/js/header.js}"></script>
+
+  <div th:substituteby="this :: script"></div>
+
+</body>
+</html>

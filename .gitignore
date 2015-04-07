@@ -1,0 +1,16 @@
+.metadata
+.project
+.classpath
+.checkstyle
+.djunitplugin
+.settings/
+.db
+.log
+target/
+bin/
+classes/
+*.bak
+*.swp
+*.log
+*~
+

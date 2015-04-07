@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+JavaFX-Version: 8.0
+JavaFX-Application-Class: iz.oraclient.OraclientMain
+Created-By: iz-j
+Main-Class: com/javafx/main/Main
