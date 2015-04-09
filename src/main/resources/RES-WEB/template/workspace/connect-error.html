@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:include="envelope :: envelope">
+<head th:fragment="link" th:remove="tag">
+</head>
+
+<div th:fragment="content">
+  <div class="row">
+    <div class="col-lg-6 col-lg-offset-3">
+      <div class="alert alert-danger">
+        <h3>
+          <strong th:text="${errorMessage}"></strong>
+        </h3>
+        <p>Check the connection information or the health of database.</p>
+        <hr />
+        <pre th:text="${errorDetail}" style="color: whitesmoke; max-height: 400px;"></pre>
+        <a th:href="@{/connections}" class="alert-link">Back</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<object th:fragment="script" th:remove="tag"> </object>
+</html>

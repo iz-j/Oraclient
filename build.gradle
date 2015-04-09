@@ -40,10 +40,11 @@ dependencies {
 			'commons-io:commons-io:2.+',
 			'com.fasterxml.jackson.core:jackson-databind:2.4.+',
 			'com.fasterxml.jackson.datatype:jackson-datatype-joda:2.4.+',
-			'org.hibernate:hibernate-validator:5.1.+',
+			'org.apache.tomcat:tomcat-jdbc:8.0.+',
 			)
 
-	compile('org.thymeleaf:thymeleaf:2.1.+',
+	compile(
+			'org.thymeleaf:thymeleaf:2.1.+',
 			'org.thymeleaf:thymeleaf-spring4:2.1.+',
 			)
 
@@ -52,6 +53,12 @@ dependencies {
 			'org.springframework:spring-webmvc:4.1.+',
 			'org.springframework:spring-aspects:4.1.+',
 			'org.springframework:spring-jdbc:4.1.+',
+			'org.springframework:spring-context-support:4.1.+',
+			)
+
+	compile(
+			'net.sf.ehcache:ehcache:2.+',
+			'org.hibernate:hibernate-validator:5.1.+',
 			)
 
 	compile(

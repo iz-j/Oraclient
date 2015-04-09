@@ -82,6 +82,7 @@ public final class ViaJetty {
 			server.join();
 		} catch (Exception e) {
 			logger.warn("Failed to stop server!", e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -93,6 +94,7 @@ public final class ViaJetty {
 			server.join();
 		} catch (Exception e) {
 			logger.warn("Failed to join server!", e);
+			throw new RuntimeException(e);
 		}
 	}
 }

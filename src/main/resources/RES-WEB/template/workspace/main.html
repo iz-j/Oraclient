@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:include="envelope :: envelope">
+<head th:fragment="link" th:remove="tag">
+<link rel="stylesheet" type="text/css" th:href="@{/css/workspace/main.css}" />
+</head>
+
+<div th:fragment="content">
+  <input id="connection-id" type="hidden" th:value="${connectionId}" />
+
+  <!-- Search tables or querys. -->
+  <div class="row">
+    <div class="col-lg-2 form-group">
+      <input id="search-sql" type="hidden" data-placeholder="Search table or template..."  style="width: 100%;"/>
+     </div>
+  </div>
+  <!-- END Search tables or querys. -->
+
+  <!-- List of SQLs -->
+  <div id="sql-container" class="row">
+  </div>
+  <!-- END List of SQLs -->
+</div>
+
+<object th:fragment="script" th:remove="tag">
+  <script type="text/javascript" th:src="@{/js/workspace/sql-container.js}"></script>
+  <script type="text/javascript" th:src="@{/js/workspace/main.js}"></script>
+</object>
+</html>

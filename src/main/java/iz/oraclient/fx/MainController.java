@@ -1,7 +1,10 @@
 package iz.oraclient.fx;
 
 import iz.oraclient.base.AppDataManager;
+import iz.oraclient.web.ViaJetty;
 
+import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -52,6 +55,8 @@ public class MainController implements Initializable {
 	@FXML
 	private Button btnBrowser;
 
+	private ViaJetty server;
+
 	private static final Image IMG_RUNNING = new Image(ClassLoader.getSystemResourceAsStream("RES-FX/running.gif"));
 	private static final Image IMG_READY = new Image(ClassLoader.getSystemResourceAsStream("RES-FX/ready.png"));
 
@@ -85,20 +90,37 @@ public class MainController implements Initializable {
 		});
 		loadConfig();
 
+		// Start & stop server.
 		btnServer.setOnAction(event -> {
+			btnServer.setDisable(true);
 			if (StringUtils.equals(btnServer.getText(), SERVER_START)) {
 				// Start server.
+				startServer();
 				toRunning();
+				launchBrowser();
+				stage.setIconified(true);
 			} else {
 				// Stop server.
+				stopServer();
 				toReady();
 			}
+			btnServer.setDisable(false);
+		});
+
+		// Launch browser.
+		btnBrowser.setOnAction(event -> {
+			launchBrowser();
+		});
+
+		// Stop server when exit application.
+		stage.setOnCloseRequest(event -> {
+			stopServer();
 		});
 	}
 
 	private void saveConfig() {
 		if (StringUtils.isNumeric(txtPort.getText())) {
-			AppDataManager.save(new LaunchConfig(Integer.parseInt(txtPort.getText()), cbAutoStart.isSelected()));
+			AppDataManager.save(new LaunchConfig(getPort(), cbAutoStart.isSelected()));
 		}
 	}
 
@@ -124,8 +146,46 @@ public class MainController implements Initializable {
 		cbAutoStart.setDisable(true);
 	}
 
+	private void startServer() {
+		try {
+			server = new ViaJetty(getPort());
+			server.start();
+			putLog("Server started. Port = " + getPort());
+		} catch (Throwable e) {
+			putLog("Failed to start server!");
+			putLog(e.getMessage());
+		}
+	}
+
+	private void stopServer() {
+		if (server == null) {
+			return;
+		}
+		server.stop();
+		server = null;
+		putLog("Server stopped.");
+	}
+
+	private void launchBrowser() {
+		try {
+			java.awt.Desktop.getDesktop().browse(
+					URI.create(StringUtils.join("http://localhost:", String.valueOf(getPort()), "/")));
+		} catch (IOException e) {
+			logger.warn("Failed to launch browser!", e);
+			putLog("Failed to launch browser!");
+			putLog(e.getMessage());
+		}
+	}
+
+	private int getPort() {
+		if (StringUtils.isNumeric(txtPort.getText())) {
+			return Integer.parseInt(txtPort.getText());
+		} else {
+			return 8888;
+		}
+	}
+
 	private void putLog(String msg) {
 		txtLog.appendText(LocalTime.now().toString("HH:mm:ss ") + msg + System.lineSeparator());
 	}
-
 }

@@ -1,13 +1,13 @@
 <tr th:each="c : ${connections}" th:if="${connections.size() > 0}">
-  <td><a th:href="@{'/workspace?id=' + ${c.id}}"><strong th:text="${c.name}"></strong></a></td>
+  <td><a th:href="@{'/workspace/' + ${c.id}}"><strong th:text="${c.name}"></strong></a></td>
   <td th:text="${c.host}"></td>
   <td th:text="${c.port}"></td>
   <td th:text="${c.sid}"></td>
   <td th:text="${c.username}"></td>
   <td th:text="${c.password}"></td>
   <td class="text-center">
-    <a href="javascript:void(0)" class="btn btn-effect-ripple btn-xs btn-danger" title=""
-      data-toggle="tooltip" data-original-title="Delete" th:attr="data-id=${c.id}">
+    <a href="javascript:void(0)" class="btn btn-effect-ripple btn-xs btn-danger remove-btn" title=""
+      data-toggle="tooltip" data-original-title="Delete" th:attr="data-id=${c.id},data-name=${c.name}">
       <i class="fa fa-times"></i>
     </a>
   </td>
@@ -16,4 +16,3 @@
 <tr th:if="${connections.size() == 0}">
   <td colspan="7"><h3>No connections.</h3></td>
 </tr>
-

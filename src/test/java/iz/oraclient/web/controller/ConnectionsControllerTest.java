@@ -2,7 +2,7 @@ package iz.oraclient.web.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import iz.oraclient.AbstractMvcTest;
+import iz.oraclient.AbstractSpringTest;
 import iz.oraclient.base.Jacksons;
 import iz.oraclient.web.process.connection.dto.Connection;
 
@@ -14,7 +14,7 @@ import org.springframework.http.MediaType;
  * @author izumi_j
  *
  */
-public class ConnectionsControllerTest extends AbstractMvcTest {
+public class ConnectionsControllerTest extends AbstractSpringTest {
 
 	@Test
 	public void test_addNewConnection() throws Exception {

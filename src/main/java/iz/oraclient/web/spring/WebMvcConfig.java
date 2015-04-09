@@ -1,7 +1,13 @@
 package iz.oraclient.web.spring;
 
+import iz.oraclient.web.spring.mvc.GlobalExceptionResolver;
+import iz.oraclient.web.spring.mvc.PerformanceLoggingInterceptor;
+
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -38,6 +44,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
 		RequestMappingHandlerMapping requestMappingHandlerMapping = super.requestMappingHandlerMapping();
 		requestMappingHandlerMapping.setUseSuffixPatternMatch(false);
 		requestMappingHandlerMapping.setUseTrailingSlashMatch(false);
+		requestMappingHandlerMapping.setInterceptors(new Object[] { performanceLoggingInterceptor() });
 		return requestMappingHandlerMapping;
 	}
 
@@ -92,4 +99,19 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
 		return thymeleafViewResolver;
 	}
 
+	@Bean
+	public PerformanceLoggingInterceptor performanceLoggingInterceptor() {
+		return new PerformanceLoggingInterceptor();
+	}
+
+	@Override
+	@Bean
+	public HandlerExceptionResolver handlerExceptionResolver() {
+		return super.handlerExceptionResolver();
+	}
+
+	@Override
+	protected void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
+		exceptionResolvers.add(new GlobalExceptionResolver());
+	}
 }

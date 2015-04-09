@@ -22,6 +22,20 @@ $(function() {
     }).done(function(res) {
       tbl.setBody(res);
       dlg.hide();
+      Base.growl('New connection added.');
+    });
+  };
+
+  // Remove connection.
+  tbl.onRemoveClick = function(id, name) {
+    $.ajax({
+      url: '/connections/remove',
+      type: 'post',
+      data: {id: id},
+      dataType: 'html'
+    }).done(function(res) {
+      tbl.setBody(res);
+      Base.growl('Connection "' + name + '" was removed.');
     });
   };
 

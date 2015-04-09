@@ -121,8 +121,9 @@
   <script th:src="@{/lib/app-ui/js/plugins.js}"></script>
   <script th:src="@{/lib/app-ui/js/app.js}"></script>
 
-  <script th:src="@{/js/header.js}"></script>
-
+  <!-- Oraclient base -->
+  <script th:src="@{/js/base.js}"></script>
+  <!-- Script by each page -->
   <div th:substituteby="this :: script"></div>
 
 </body>
