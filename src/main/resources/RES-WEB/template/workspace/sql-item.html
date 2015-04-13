@@ -1,6 +1,6 @@
 <div class="col-lg-3 col-sm-4 sql-item-root" th:each="sql : ${sqls}">
-  <a href="javascript:void(0)" class="widget sql-item" th:id="${sql.id}"
-    th:attr="data-type=${sql.type},data-name=${sql.name},data-sentence=${sql.sentence}">
+  <a href="javascript:void(0)" class="widget sql-item" th:id="'sql-' + ${sql.id}"
+    th:attr="data-id=${sql.id},data-type=${sql.type},data-name=${sql.name},data-sentence=${sql.sentence}">
     <div class="widget-content widget-content-mini themed-background text-light sql-item-name">
       <div class="pull-right">
         <i class="fa fa-floppy-o"></i>&nbsp;

@@ -100,6 +100,6 @@ ConnectionDialog.prototype._handleSubmit = function(e) {
     $.each($('#frm-new').serializeArray(), function(i, v) {
       data[v.name] = v.value;
     });
-    this.onSubmit(JSON.stringify(data));
+    this.onSubmit(data);
   }
 };

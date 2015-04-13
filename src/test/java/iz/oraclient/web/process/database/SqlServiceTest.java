@@ -12,7 +12,7 @@ public class SqlServiceTest extends AbstractSpringTest {
 	private static final Logger logger = LoggerFactory.getLogger(SqlServiceTest.class);
 
 	@Autowired
-	private SqlService service;
+	private DatabaseService service;
 
 	@Test
 	public void test_getMatchedTemplates() {

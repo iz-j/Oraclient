@@ -17,7 +17,7 @@ $(function() {
       url: '/connections/new',
       type: 'post',
       contentType: 'application/json',
-      data: data,
+      data: JSON.stringify(data),
       dataType: 'html'
     }).done(function(res) {
       tbl.setBody(res);

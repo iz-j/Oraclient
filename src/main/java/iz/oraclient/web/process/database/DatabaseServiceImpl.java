@@ -1,6 +1,7 @@
 package iz.oraclient.web.process.database;
 
 import iz.oraclient.web.process.database.dao.DatabaseInfoDao;
+import iz.oraclient.web.process.database.dto.ExecutionResult;
 import iz.oraclient.web.process.database.dto.SqlTemplate;
 import iz.oraclient.web.process.database.dto.SqlTemplate.TemplateType;
 import iz.oraclient.web.spring.jdbc.ConnectionDeterminer;
@@ -19,8 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SqlServiceImpl implements SqlService {
-	private static final Logger logger = LoggerFactory.getLogger(SqlServiceImpl.class);
+public class DatabaseServiceImpl implements DatabaseService {
+	private static final Logger logger = LoggerFactory.getLogger(DatabaseServiceImpl.class);
 
 	@Autowired
 	private DatabaseInfoDao dbDao;
@@ -56,6 +57,12 @@ public class SqlServiceImpl implements SqlService {
 
 		logger.trace("{} templates found.", templates.size());
 		return templates;
+	}
+
+	@Override
+	public ExecutionResult executeSql(SqlTemplate sql) {
+		final String actualSql = "SELECT rowid, T.* FROM (" + sql.sentence + ") T";
+		return dbDao.executeQuery(actualSql);
 	}
 
 }

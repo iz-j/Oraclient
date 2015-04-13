@@ -2,7 +2,7 @@ package iz.oraclient.web.controller;
 
 import iz.oraclient.web.process.connection.ConnectionService;
 import iz.oraclient.web.process.connection.dto.Connection;
-import iz.oraclient.web.process.database.SqlService;
+import iz.oraclient.web.process.database.DatabaseService;
 import iz.oraclient.web.process.database.dto.SqlTemplate;
 import iz.oraclient.web.spring.jdbc.ConnectionDeterminer;
 import iz.oraclient.web.spring.jdbc.DatabaseException;
@@ -31,7 +31,7 @@ public class WorkspaceController {
 	private ConnectionService connectionService;
 
 	@Autowired
-	private SqlService sqlService;
+	private DatabaseService sqlService;
 
 	@RequestMapping(value = "/{connectionId}", method = RequestMethod.GET)
 	public ModelAndView page(@PathVariable("connectionId") String connectionId) {
@@ -66,8 +66,4 @@ public class WorkspaceController {
 		return mv;
 	}
 
-	@RequestMapping(value = "/test", method = RequestMethod.GET)
-	public ModelAndView test() {
-		return ControllerHelper.createModelAndViewForPage("test", "Test");
-	}
 }

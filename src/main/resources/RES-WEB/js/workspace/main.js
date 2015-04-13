@@ -5,11 +5,16 @@ Ws.sqlContainer = null;
 Ws.sqlEditor = null;
 Ws.adaptor = null;
 
+Ws.resizeTimerId = null;
+
 /**
  * Adjust layout when window is resized.
  */
 Ws.adjustContentsHeight = function() {
-  $('#page-content').css('height', $('#page-content').css('min-height'));
+  clearTimeout(Ws.resizeTimerId);
+  setTimeout(function() {
+    $('#page-content').css('height', $('#page-content').css('min-height'));
+  }, 200);
 };
 
 /**
@@ -74,6 +79,7 @@ Ws.initSearchSql = function() {
  */
 Ws.onSqlSelected = function(sql) {
   Ws.sqlEditor.setSql(sql);
+  Ws.adaptor.setSql(sql, Ws.connectionId);
 };
 
 /**
@@ -81,6 +87,7 @@ Ws.onSqlSelected = function(sql) {
  */
 Ws.onSqlChanged = function(sql) {
   Ws.sqlContainer.update(sql);
+  Ws.adaptor.update(sql);
 };
 
 /**

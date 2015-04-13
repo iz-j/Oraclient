@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:include="envelope :: envelope">
 <head th:fragment="link" th:remove="tag">
-  <link rel="stylesheet" type="text/css" th:href="@{/lib/handsontable/handsontable.bootstrap.css}" />
-  <link rel="stylesheet" type="text/css" th:href="@{/lib/handsontable/handsontable.full.css}" />
   <link rel="stylesheet" type="text/css" th:href="@{/css/workspace/main.css}" />
 </head>
 
@@ -42,11 +40,12 @@
     <!-- Processor adaptor -->
     <div id="processor-adaptor" class="col-lg9 col-sm-8">
       <div class="btn-toolbar">
-        <button class="btn btn-info btn-effect-ripple btn-xs" title="" data-toggle="tooltip" data-original-title="Execute">
+        <button id="btn-execute" class="btn btn-info btn-effect-ripple btn-xs"
+          title="" data-toggle="tooltip" data-original-title="Execute">
           <i class="fa fa-bolt"></i>
         </button>
-        <div class="processor-root"></div>
       </div>
+      <div id="processor-root"></div>
     </div>
     <!-- END Processor adaptor -->
   </div>
@@ -54,7 +53,6 @@
 </div>
 
 <object th:fragment="script" th:remove="tag">
-  <script type="text/javascript" th:src="@{/lib/handsontable/handsontable.full.js}"></script>
   <script type="text/javascript" th:src="@{/js/workspace/sql-container.js}"></script>
   <script type="text/javascript" th:src="@{/js/workspace/sql-editor.js}"></script>
   <script type="text/javascript" th:src="@{/js/workspace/processor-adaptor.js}"></script>

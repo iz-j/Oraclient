@@ -23,7 +23,7 @@ SqlContainer.prototype.addSqlNode = function(html) {
   var el = $(html);
   $('#sql-items').append(el);
   // Select first element and show.
-  this.select(el.first().children().first().attr('id'));
+  this.select(el.first().children().first().data('id'));
   $('#sql-items').scrollTop($('#sql-items').height());
 };
 
@@ -73,7 +73,7 @@ SqlContainer.prototype._selected = null;
  */
 SqlContainer.prototype._createModelOf = function(a) {
   return {
-    id: $(a).attr('id'),
+    id: $(a).data('id'),
     type: $(a).data('type'),
     name: $(a).data('name'),
     sentence: $(a).data('sentence')
@@ -85,7 +85,7 @@ SqlContainer.prototype._createModelOf = function(a) {
  * @returns anchor element
  */
 SqlContainer.prototype._find = function(id) {
-  return $('#' + id);
+  return $('#sql-' + id);
 };
 
 /**
@@ -111,5 +111,5 @@ SqlContainer.prototype._handleClick = function(e) {
   // Fire each events when functional buttons are clicked.
 
   // Otherwise, fire change event.
-  this.select($(a).attr('id'));
+  this.select($(a).data('id'));
 };
