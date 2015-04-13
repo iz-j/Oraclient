@@ -104,8 +104,7 @@
         <!-- END Header -->
 
         <!-- Page content -->
-        <div id="page-content">
-          <div th:replace="this :: content"></div>
+        <div id="page-content" th:include="this :: content">
         </div>
         <!-- END Page Content -->
       </div>

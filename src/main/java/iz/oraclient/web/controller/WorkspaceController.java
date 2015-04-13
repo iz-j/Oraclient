@@ -1,6 +1,7 @@
 package iz.oraclient.web.controller;
 
 import iz.oraclient.web.process.connection.ConnectionService;
+import iz.oraclient.web.process.connection.dto.Connection;
 import iz.oraclient.web.process.database.SqlService;
 import iz.oraclient.web.process.database.dto.SqlTemplate;
 import iz.oraclient.web.spring.jdbc.ConnectionDeterminer;
@@ -35,13 +36,14 @@ public class WorkspaceController {
 	@RequestMapping(value = "/{connectionId}", method = RequestMethod.GET)
 	public ModelAndView page(@PathVariable("connectionId") String connectionId) {
 		logger.trace("#page connectionId = {}", connectionId);
+		final Connection c = connectionService.get(connectionId);
 		ModelAndView mv;
 		try {
 			connectionService.activateConnection(connectionId);
-			mv = ControllerHelper.createModelAndViewForPage("workspace/main", "Workspace");
+			mv = ControllerHelper.createModelAndViewForPage("workspace/main", c.name);
 			mv.addObject("connectionId", connectionId);
 		} catch (DatabaseException e) {
-			mv = ControllerHelper.createModelAndViewForPage("workspace/connect-error", "Workspace");
+			mv = ControllerHelper.createModelAndViewForPage("workspace/connect-error", c.name);
 			mv.addObject("errorMessage", e.getMessage());
 			mv.addObject("errorDetail", e.getStackTraceAsString());
 		}
@@ -62,5 +64,10 @@ public class WorkspaceController {
 		final ModelAndView mv = new ModelAndView("workspace/sql-item");
 		mv.addObject("sqls", Arrays.asList(sqlTemplate));
 		return mv;
+	}
+
+	@RequestMapping(value = "/test", method = RequestMethod.GET)
+	public ModelAndView test() {
+		return ControllerHelper.createModelAndViewForPage("test", "Test");
 	}
 }

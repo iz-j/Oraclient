@@ -7,6 +7,7 @@ import iz.oraclient.web.spring.jdbc.DataSourceRouter;
 import iz.oraclient.web.spring.jdbc.DatabaseException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.sql.DataSource;
@@ -67,17 +68,19 @@ public class ConnectionServiceImpl implements ConnectionService {
 	@Override
 	public Connection get(String id) {
 		final Connections connections = AppDataManager.load(Connections.class);
-		return connections.getList().stream().filter(e -> {
+		final Optional<Connection> c = connections.getList().stream().filter(e -> {
 			return StringUtils.equals(id, e.id);
-		}).findFirst().get();
+		}).findFirst();
+
+		if (!c.isPresent()) {
+			throw new IllegalStateException("Connection was not found! id = " + id);
+		}
+		return c.get();
 	}
 
 	@Override
 	public void activateConnection(String id) throws DatabaseException {
 		final Connection c = get(id);
-		if (c == null) {
-			throw new IllegalStateException("Connection was not found! id = " + id);
-		}
 
 		if (dataSource instanceof DataSourceRouter) {
 			((DataSourceRouter)dataSource).addNewConnection(c.id, c.host, c.port, c.sid, c.username, c.password);

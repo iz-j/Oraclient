@@ -1,28 +1,63 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:include="envelope :: envelope">
 <head th:fragment="link" th:remove="tag">
-<link rel="stylesheet" type="text/css" th:href="@{/css/workspace/main.css}" />
+  <link rel="stylesheet" type="text/css" th:href="@{/lib/handsontable/handsontable.bootstrap.css}" />
+  <link rel="stylesheet" type="text/css" th:href="@{/lib/handsontable/handsontable.full.css}" />
+  <link rel="stylesheet" type="text/css" th:href="@{/css/workspace/main.css}" />
 </head>
 
 <div th:fragment="content">
   <input id="connection-id" type="hidden" th:value="${connectionId}" />
 
-  <!-- Search tables or querys. -->
-  <div class="row">
-    <div class="col-lg-2 form-group">
+  <!-- Tools -->
+  <div id="tool-area" class="row">
+    <!-- Search tables or querys. -->
+    <div class="col-lg-3 col-sm-6">
       <input id="search-sql" type="hidden" data-placeholder="Search table or template..."  style="width: 100%;"/>
      </div>
+     <!-- END Search tables or querys. -->
   </div>
-  <!-- END Search tables or querys. -->
+  <!-- END Tools -->
 
   <!-- List of SQLs -->
-  <div id="sql-container" class="row">
+  <div id="list-area" class="row">
+    <div id="list-col" class="col-lg-12">
+      <div id="sql-items"></div>
+    </div>
   </div>
   <!-- END List of SQLs -->
+
+  <!-- Workspace -->
+  <div id="workspace" class="row">
+    <!-- SQL Editor -->
+    <div id="sql-editor-root" class="col-lg2 col-sm-4">
+      <div class="btn-toolbar">
+        <button class="btn btn-primary btn-effect-ripple btn-xs" title="" data-toggle="tooltip" data-original-title="Format">
+          <i class="fa fa-indent"></i>
+        </button>
+      </div>
+      <textarea id="sql-editor" class="form-control" style="resize: none;" wrap="off" placeholder="SQL sentence..."></textarea>
+    </div>
+    <!-- END SQL Editor -->
+    <!-- Processor adaptor -->
+    <div id="processor-adaptor" class="col-lg9 col-sm-8">
+      <div class="btn-toolbar">
+        <button class="btn btn-info btn-effect-ripple btn-xs" title="" data-toggle="tooltip" data-original-title="Execute">
+          <i class="fa fa-bolt"></i>
+        </button>
+        <div class="processor-root"></div>
+      </div>
+    </div>
+    <!-- END Processor adaptor -->
+  </div>
+  <!-- END Workspace -->
 </div>
 
 <object th:fragment="script" th:remove="tag">
+  <script type="text/javascript" th:src="@{/lib/handsontable/handsontable.full.js}"></script>
   <script type="text/javascript" th:src="@{/js/workspace/sql-container.js}"></script>
+  <script type="text/javascript" th:src="@{/js/workspace/sql-editor.js}"></script>
+  <script type="text/javascript" th:src="@{/js/workspace/processor-adaptor.js}"></script>
   <script type="text/javascript" th:src="@{/js/workspace/main.js}"></script>
 </object>
 </html>

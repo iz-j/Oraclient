@@ -1,15 +1,16 @@
-<div class="col-lg-3" th:each="sql : ${sqls}">
-  <a href="javascript:void(0)" class="widget">
-    <div class="widget-content widget-content-mini themed-background text-light">
+<div class="col-lg-3 col-sm-4 sql-item-root" th:each="sql : ${sqls}">
+  <a href="javascript:void(0)" class="widget sql-item" th:id="${sql.id}"
+    th:attr="data-type=${sql.type},data-name=${sql.name},data-sentence=${sql.sentence}">
+    <div class="widget-content widget-content-mini themed-background text-light sql-item-name">
       <div class="pull-right">
         <i class="fa fa-floppy-o"></i>&nbsp;
         <i class="fa fa-times"></i>
       </div>
       <i class="fa" th:classappend="${sql.type.toString().equals('TABLE')} ? 'fa-table' : 'fa-file-text-o'"></i>&nbsp;
-      <strong th:text="${sql.name}"></strong>
+      <strong class="sql-name" th:text="${sql.name}"></strong>
     </div>
     <div class="widget-content clearfix">
-      <p th:text="${sql.sentence}"></p>
+      <p class="sql-sentence" th:text="${sql.sentence}"></p>
     </div>
   </a>
 </div>

@@ -3,7 +3,6 @@
  * @public
  */
 ConnectionDialog = function() {
-  this._form = $('#frm-new');
   this._validate();
   $('#dlg-new').on('shown.bs.modal', function (e) {
     $('#name').focus();
@@ -24,7 +23,7 @@ ConnectionDialog.prototype.onSubmit = function(data){
  * @public
  */
 ConnectionDialog.prototype.show = function() {
-  this._form.find('textarea, :text, select').val('').end().find(':checked').prop('checked', false);
+  $('#frm-new').find('textarea, :text, select').val('').end().find(':checked').prop('checked', false);
   $('#dlg-new').modal('show');
 };
 
@@ -37,18 +36,12 @@ ConnectionDialog.prototype.hide = function() {
 };
 
 /**
- * Form via jQuery.
- * @private
- */
-ConnectionDialog.prototype._form = null;
-
-/**
  * Validation settings.
  * @private
  */
 ConnectionDialog.prototype._validate = function() {
   var REQUIRED_MSG = 'This field is required.';
-  this._form.validate({
+  $('#frm-new').validate({
     errorClass: 'help-block animation-slideUp',
     errorElement: 'div',
     errorPlacement: function(error, e) {
@@ -102,9 +95,9 @@ ConnectionDialog.prototype._validate = function() {
  * @private
  */
 ConnectionDialog.prototype._handleSubmit = function(e) {
-  if (this._form.valid()) {
+  if ($('#frm-new').valid()) {
     var data = {};
-    $.each(this._form.serializeArray(), function(i, v) {
+    $.each($('#frm-new').serializeArray(), function(i, v) {
       data[v.name] = v.value;
     });
     this.onSubmit(JSON.stringify(data));

@@ -1,0 +1,64 @@
+#tool-area {
+  height: 45px;
+}
+
+#list-area {
+  height: calc(30% - 45px);
+}
+
+#list-col {
+  height: 100%;
+}
+
+#sql-items {
+  height: 100%;
+  border: solid 1px silver;
+  overflow-y: scroll;
+  padding-top: 10px;
+}
+
+#sql-items .widget {
+  margin-bottom: 10px;
+}
+
+#sql-items .widget-content {
+  padding: 5px;
+}
+
+#sql-items .sql-item-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#sql-items .sql-sentence {
+  height: 20px;
+  margin: 0;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#workspace {
+  height: calc(70% - 45px);
+  margin-top: 10px;
+}
+
+#sql-editor-root {
+  height: 100%;
+}
+
+#sql-editor {
+  height: calc(100% - 1px);
+}
+
+#data-table-root {
+  height: 100%;
+}
+
+#data-table {
+  height: 300px;
+  width: 300px;
+  overflow: hidden;
+}

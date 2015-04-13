@@ -3,8 +3,7 @@
  * @public
  */
 ConnectionTable = function() {
-  this._table = $('#tbl');
-  this._table.on('click', this._handleClick.bind(this));
+  $('#tbl').on('click', this._handleClick.bind(this));
 };
 
 /**
@@ -20,7 +19,7 @@ ConnectionTable.prototype.onRemoveClick = function(id, name){
  * @public
  */
 ConnectionTable.prototype.setBody = function(trList) {
-  this._table.find('tbody').empty().append(trList);
+  $('#tbl').find('tbody').empty().append(trList);
 };
 
 /**

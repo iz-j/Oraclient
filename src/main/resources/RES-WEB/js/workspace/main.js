@@ -1,8 +1,22 @@
-$(function() {
-  var connectionId = $('#connection-id').val();
-  var sqlContainer = new SqlContainer();
+var Ws = {};
 
-  // Search sql templates.
+Ws.connectionId = null;
+Ws.sqlContainer = null;
+Ws.sqlEditor = null;
+Ws.adaptor = null;
+
+/**
+ * Adjust layout when window is resized.
+ */
+Ws.adjustContentsHeight = function() {
+  $('#page-content').css('height', $('#page-content').css('min-height'));
+};
+
+/**
+ * Initialize tables and templates search via Select2.
+ */
+Ws.initSearchSql = function() {
+  // Search tables and sql templates.
   $('#search-sql').select2({
     minimumInputLength: 3,
     ajax: {
@@ -11,7 +25,7 @@ $(function() {
       quietMillis: 300,
       data: function (term, page) {
         return {
-          connectionId: connectionId,
+          connectionId: Ws.connectionId,
           term: term,
           page: page
         };
@@ -35,9 +49,12 @@ $(function() {
     formatSelection: function(obj) {
       return obj.name;
     },
-    escapeMarkup: function(m) { return m; }
+    nextSearchTerm: function(obj, term) {
+      return term;
+    }
   });
 
+  // When sql template is selected.
   $('#search-sql').on('change', function(e) {
     $('#search-sql').select2('val', '');
     $.ajax({
@@ -47,7 +64,38 @@ $(function() {
       contentType: 'application/json',
       data: JSON.stringify(e.added)
     }).done(function(res) {
-      sqlContainer.addSqlNode(res);
+      Ws.sqlContainer.addSqlNode(res);
     });
   });
+};
+
+/**
+ * Event when SQL is selected in SqlContainer.
+ */
+Ws.onSqlSelected = function(sql) {
+  Ws.sqlEditor.setSql(sql);
+};
+
+/**
+ * Event when SQL sentence was changed
+ */
+Ws.onSqlChanged = function(sql) {
+  Ws.sqlContainer.update(sql);
+};
+
+/**
+ * OnReady.
+ */
+$(function() {
+  Ws.connectionId = $('#connection-id').val();
+  Ws.sqlContainer = new SqlContainer();
+  Ws.sqlEditor = new SqlEditor();
+  Ws.adaptor = new ProcessorAdaptor();
+
+  $(window).on('resize orientationchange', Ws.adjustContentsHeight).resize();
+
+  Ws.initSearchSql();
+
+  Ws.sqlContainer.onChange = Ws.onSqlSelected;
+  Ws.sqlEditor.onChange = Ws.onSqlChanged;
 });

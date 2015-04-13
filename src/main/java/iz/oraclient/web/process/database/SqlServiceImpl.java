@@ -41,7 +41,7 @@ public class SqlServiceImpl implements SqlService {
 			t.id = UUID.randomUUID().toString();
 			t.type = TemplateType.TABLE;
 			t.name = StringUtils.upperCase(tableName);
-			t.sentence = "SELECT * FROM " + StringUtils.upperCase(tableName);
+			t.sentence = "SELECT * FROM " + StringUtils.upperCase(tableName) + System.lineSeparator();
 			return t;
 		}).collect(Collectors.toList()));
 
