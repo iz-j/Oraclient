@@ -19,7 +19,7 @@
           <h2>Connection List</h2>
         </div>
         <div class="table-responsive">
-          <table id="tbl" class="table table-striped table-vcenter table-bordered table-condensed table-hover">
+          <table id="connection-list" class="table table-striped table-vcenter table-bordered table-condensed table-hover">
             <thead>
               <tr>
                 <th>Name</th>
@@ -28,7 +28,7 @@
                 <th>Sid</th>
                 <th>Username</th>
                 <th>Password</th>
-                <th style="width: 80px;" class="text-center"><i class="fa fa-times"></i></th>
+                <th style="width: 80px;" class="text-center"><i class="fa fa-bolt"></i></th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -40,7 +40,7 @@
   <!-- END Connection List -->
 
   <!-- Connection Dialog -->
-  <div id="dlg-new" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+  <div id="connection-dialog" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -50,7 +50,7 @@
           </h3>
         </div>
         <div class="modal-body">
-          <form id="frm-new" class="form-horizontal form-bordered">
+          <form id="connection-form" class="form-horizontal form-bordered">
             <div class="form-group">
               <label class="col-md-3 control-label" for="name">Name</label>
               <div class="col-md-9">
@@ -102,7 +102,7 @@
 </div>
 
 <object th:fragment="script" th:remove="tag">
-  <script type="text/javascript" th:src="@{/js/connections/table.js}"></script>
+  <script type="text/javascript" th:src="@{/js/connections/list.js}"></script>
   <script type="text/javascript" th:src="@{/js/connections/dialog.js}"></script>
   <script type="text/javascript" th:src="@{/js/connections/main.js}"></script>
 </object>

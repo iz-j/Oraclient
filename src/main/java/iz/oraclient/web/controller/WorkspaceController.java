@@ -4,6 +4,7 @@ import iz.oraclient.web.process.connection.ConnectionService;
 import iz.oraclient.web.process.connection.dto.Connection;
 import iz.oraclient.web.process.database.DatabaseService;
 import iz.oraclient.web.process.database.dto.SqlTemplate;
+import iz.oraclient.web.process.database.helper.SqlFormatter;
 import iz.oraclient.web.spring.jdbc.ConnectionDeterminer;
 import iz.oraclient.web.spring.jdbc.DatabaseException;
 
@@ -66,4 +67,9 @@ public class WorkspaceController {
 		return mv;
 	}
 
+	@RequestMapping(value = "/formatSql", method = RequestMethod.POST)
+	public @ResponseBody String formatSql(@RequestBody SqlTemplate sql) {
+		logger.trace("#formatSql sql = {}", sql);
+		return SqlFormatter.format(sql.sentence);
+	}
 }

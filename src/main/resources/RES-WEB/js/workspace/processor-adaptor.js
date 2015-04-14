@@ -1,93 +1,90 @@
 /**
- * Processor Adaptor.
- * @public
+ * Processor adaptor.
  */
-ProcessorAdaptor = function() {
-  $('#btn-execute').on('click', this._handleExecute.bind(this));
-};
 
-/**
- * @public
- */
-ProcessorAdaptor.prototype.setSql = function(sql, connectionId) {
-  var ifrm = null;
-  // Hide current.
-  if (this._sql) {
-    ifrm = this._findIframe(this._sql.id);
-    if (ifrm) {
-      $(ifrm).hide();
+var ProcessorAdaptor = function() {
+
+  var _connectionId = null;
+  var _sql = null;
+
+  // PUBLIC --------------------------------------------------
+
+  function init(connectionId) {
+    _connectionId = connectionId;
+  }
+
+  function setSql(sql) {
+    var ifrm = null;
+
+    // Remove if sql is null.
+    if (!sql) {
+      ifrm = _findIframe(_sql.id);
+      ifrm && $(ifrm).remove();
+      return;
+    }
+
+    // Hide current.
+    if (_sql) {
+      ifrm = _findIframe(_sql.id);
+      ifrm && $(ifrm).hide();
+      ifrm = null;
+    }
+
+    // Show new.
+    _sql = sql;
+    ifrm = _findIframe(sql.id);
+    if (!ifrm) {
+      $('#processor-root')
+        .append('<iframe src="/processor/' + _connectionId + '" id="processor-' + sql.id + '" />');
+      ifrm = _findIframe(sql.id);
+    }
+    $(ifrm).show();
+  }
+
+  function updateSql(sql) {
+    if (!sql) {
+      return;
+    }
+    if (_sql.id == sql.id) {
+      _sql.sentence = sql.sentence;
     }
   }
 
-  // Show new.
-  this._sql = sql;
-  var ifrm = this._findIframe(sql.id);
-  if (!ifrm) {
-    $('#processor-root')
-      .append('<iframe src="/processor/' + connectionId + '" id="processor-' + sql.id + '" />');
-    ifrm = this._findIframe(sql.id);
+  function removeSql(sql) {
+    _find(sql.id).remove();
   }
-  $(ifrm).show();
-};
 
-/**
- * @public
- */
-ProcessorAdaptor.prototype.update = function(sql) {
-  if (this._sql.id == sql.id) {
-    this._sql.sentence = sql.sentence;
-    return;
+  function executeSql(sql) {
+    _callProcessor('execute', sql);
   }
-};
 
-/**
- * @public
- */
-ProcessorAdaptor.prototype.removeSql = function(sql) {
-  delete this._processors[sql.id];
-  this._find(sql.id).remove();
-};
+  // PRIVATE --------------------------------------------------
 
-/**
- * Current Sql model.
- * @private
- */
-ProcessorAdaptor.prototype._sql = null;
-
-/**
- * @private
- * @returns iframe
- */
-ProcessorAdaptor.prototype._findIframe = function(sqlId) {
-  return $('#processor-' + sqlId)[0];
-};
-
-/**
- * @private
- * @returns element in iframe
- */
-ProcessorAdaptor.prototype._findInIFrame = function(id) {
-  if (!this._sql) {
-    return null;
+  function _findIframe(id) {
+    return $('#processor-' + id)[0];
   }
-  var ifrm = this._findIframe(this._sql.id);
-  return ifrm ? $('#' + id, ifrm.contentWindow.document) : null;
-};
 
-/**
- * @private
- */
-ProcessorAdaptor.prototype._callIFrameFunc = function(funcName, opt_arg) {
-  if (!this._sql) {
-    return null;
+  function _findInIframe(id) {
+    if (_sql) {
+      return null;
+    }
+    var ifrm = _findIframe(_sql.id);
+    return ifrm ? $('#' + id, ifrm.contentWindow.document) : null;
   }
-  var ifrm = this._findIframe(this._sql.id);
-  return ifrm ? ifrm.contentWindow[funcName](opt_arg) : null;
-};
 
-/**
- * @private
- */
-ProcessorAdaptor.prototype._handleExecute = function() {
-  this._callIFrameFunc('proc_execute', this._sql);
-};
+  function _callProcessor(funcName, opt_arg) {
+    if (!_sql) {
+      return null;
+    }
+    var ifrm = _findIframe(_sql.id);
+    return ifrm ? ifrm.contentWindow['Processor'][funcName](opt_arg) : null;
+  }
+
+  return {
+    'init': init,
+    'setSql': setSql,
+    'updateSql': updateSql,
+    'removeSql': removeSql,
+    'executeSql': executeSql
+  };
+}();

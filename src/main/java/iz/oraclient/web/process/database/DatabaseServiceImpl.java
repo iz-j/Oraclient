@@ -41,6 +41,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 			final SqlTemplate t = new SqlTemplate();
 			t.id = UUID.randomUUID().toString();
 			t.type = TemplateType.TABLE;
+			t.tableName = StringUtils.upperCase(tableName);
 			t.name = StringUtils.upperCase(tableName);
 			t.sentence = "SELECT * FROM " + StringUtils.upperCase(tableName) + System.lineSeparator();
 			return t;

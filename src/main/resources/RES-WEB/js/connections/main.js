@@ -1,18 +1,17 @@
 $(function() {
-  var tbl = new ConnectionTable();
-  var dlg = new ConnectionDialog();
+  ConnectionList.init();
+  ConnectionDialog.init();
 
   // Load connection list.
   $.ajax({
     url: '/connections/list',
-    type: 'get',
     dataType: 'html'
   }).done(function(res) {
-    tbl.setBody(res);
+    ConnectionList.setContent(res);
   });
 
   // Post new connection.
-  dlg.onSubmit = function(data) {
+  ConnectionDialog.setOnPost(function(data) {
     $.ajax({
       url: '/connections/new',
       type: 'post',
@@ -20,27 +19,27 @@ $(function() {
       data: JSON.stringify(data),
       dataType: 'html'
     }).done(function(res) {
-      tbl.setBody(res);
-      dlg.hide();
+      ConnectionList.setContent(res);
+      ConnectionDialog.hide();
       Base.growl('New connection added.');
     });
-  };
+  });
 
   // Remove connection.
-  tbl.onRemoveClick = function(id, name) {
+  ConnectionList.setOnRemove(function(id, name) {
     $.ajax({
       url: '/connections/remove',
       type: 'post',
-      data: {id: id},
+      data: { id: id },
       dataType: 'html'
     }).done(function(res) {
-      tbl.setBody(res);
+      ConnectionList.setContent(res);
       Base.growl('Connection "' + name + '" was removed.');
     });
-  };
+  });
 
   // Others
   $('#btn-new').on('click', function() {
-    dlg.show();
+    ConnectionDialog.show();
   });
 });

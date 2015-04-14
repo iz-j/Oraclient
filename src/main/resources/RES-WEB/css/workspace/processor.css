@@ -7,8 +7,19 @@ body {
   margin: 0;
 }
 
-#actions {
-  display: none;
+#indicator {
+  color: #454e59;
+  font-family: Lato,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  padding: 10px;
+}
+
+#indicator img {
+  vertical-align: middle;
+}
+
+#indicator h4 {
+  display: inline;
+}
 
 #data-table {
   width: 100%;

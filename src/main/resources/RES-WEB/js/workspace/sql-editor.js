@@ -1,62 +1,94 @@
 /**
- * Editor for SQL sentence.
- * @public
+ * SQL editor.
  */
-SqlEditor = function() {
-  $('#sql-editor')
-    .prop('disabled', true)
-    .on('input propertychange', this._handleTextChange.bind(this));
-};
 
-/**
- * @public
- */
-SqlEditor.prototype.onChange = function(sql) {
-  console.log('Sentence changed ->\n' + sql);
-};
+var SqlEditor = function() {
 
-/**
- * @public
- */
-SqlEditor.prototype.setSql = function(sql) {
-  this._sql = sql;
-  $('#sql-editor').val(sql.sentence).prop('disabled', false).focus();
-};
+  var _onChange = null;
+  var _onExecute = null;
+  var _sql = null;
 
-/**
- * @public
- */
-SqlEditor.prototype.getSql = function() {
-  this._sql.sentence = $('#sql-editor').val();
-  return this._sql;
-};
+  var _timerId = null;
 
-/**
- * Current SQL model
- * @private
- */
-SqlEditor.prototype._sql = null;
+  // PUBLIC --------------------------------------------------
 
-
-/**
- * @private
- */
-SqlEditor.prototype._timerId = null;
-
-/**
- * @private
- */
-SqlEditor.prototype._handleTextChange = function(e) {
-  if (this._timerId) {
-    clearTimeout(this._timerId);
+  function init() {
+    $('#sql-editor').prop('disabled', true).on('input propertychange', _handleTextChange);
+    disableButtons(true);
+    $('#btn-format').on('click', _handleFormatClick);
+    $('#btn-execute').on('click', _handleExecuteClick);
   }
-  this._timerId = setTimeout(this._delayedTextChange.bind(this), 300);
-};
 
-/**
- * @private
- */
-SqlEditor.prototype._delayedTextChange = function() {
-  this._sql.sentence = $('#sql-editor').val();
-  this.onChange(this._sql);
-};
+  function setSql(sql) {
+    _sql = sql;
+    if (_sql) {
+      $('#sql-editor').val(sql.sentence).prop('disabled', false).focus();
+      disableButtons(false);
+    } else {
+      $('#sql-editor').val('').prop('disabled', true);
+      disableButtons(true);
+    }
+  }
+
+  function getSql() {
+    _sql.sentence = $('#sql-editor').val();
+    return _sql;
+  }
+
+  function disableButtons(disabled) {
+    $('#btn-format').prop('disabled', disabled);
+    $('#btn-execute').prop('disabled', disabled);
+  }
+
+  function setOnChange(fn) {
+    _onChange = fn;
+  }
+
+  function setOnExecute(fn) {
+    _onExecute = fn;
+  }
+
+  // PRIVATE --------------------------------------------------
+
+  function _handleTextChange(e) {
+    _timerId && clearTimeout(_timerId);
+    _timerId = setTimeout(function() {
+      _sql.sentence = $('#sql-editor').val();
+      _onChange && _onChange(_sql);
+    }, 300);
+  }
+
+  function _handleFormatClick(e) {
+    if (!_sql) {
+      return;
+    }
+
+    disableButtons(true);
+    $.ajax({
+      url: '/workspace/formatSql',
+      type: 'post',
+      dataType: 'text',
+      contentType: 'application/json',
+      data: JSON.stringify(_sql)
+    }).done(function(res) {
+      _sql.sentence = res;
+      $('#sql-editor').val(res);
+      _onChange && _onChange(_sql);
+    }).always(function() {
+      disableButtons(false);
+    });
+  }
+
+  function _handleExecuteClick(e) {
+    (_sql && _onExecute) && _onExecute(_sql);
+  }
+
+  return {
+    'init': init,
+    'setSql': setSql,
+    'getSql': getSql,
+    'disableButttons': disableButtons,
+    'setOnChange': setOnChange,
+    'setOnExecute': setOnExecute
+  };
+}();

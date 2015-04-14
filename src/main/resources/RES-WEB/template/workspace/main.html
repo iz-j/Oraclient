@@ -20,7 +20,7 @@
   <!-- List of SQLs -->
   <div id="list-area" class="row">
     <div id="list-col" class="col-lg-12">
-      <div id="sql-items"></div>
+      <div id="sql-list"></div>
     </div>
   </div>
   <!-- END List of SQLs -->
@@ -30,8 +30,13 @@
     <!-- SQL Editor -->
     <div id="sql-editor-root" class="col-lg2 col-sm-4">
       <div class="btn-toolbar">
-        <button class="btn btn-primary btn-effect-ripple btn-xs" title="" data-toggle="tooltip" data-original-title="Format">
+        <button id="btn-format" class="btn btn-primary btn-effect-ripple btn-xs"
+          title="" data-toggle="tooltip" data-original-title="Format">
           <i class="fa fa-indent"></i>
+        </button>
+        <button id="btn-execute" class="btn btn-info btn-effect-ripple btn-xs"
+          title="" data-toggle="tooltip" data-original-title="Execute">
+          <i class="fa fa-bolt"></i>
         </button>
       </div>
       <textarea id="sql-editor" class="form-control" style="resize: none;" wrap="off" placeholder="SQL sentence..."></textarea>
@@ -40,9 +45,9 @@
     <!-- Processor adaptor -->
     <div id="processor-adaptor" class="col-lg9 col-sm-8">
       <div class="btn-toolbar">
-        <button id="btn-execute" class="btn btn-info btn-effect-ripple btn-xs"
-          title="" data-toggle="tooltip" data-original-title="Execute">
-          <i class="fa fa-bolt"></i>
+        <button id="btn-update" class="btn btn-info btn-effect-ripple btn-xs"
+          title="" data-toggle="tooltip" data-original-title="Save">
+          <i class="fa fa-upload"></i>
         </button>
       </div>
       <div id="processor-root"></div>
@@ -53,7 +58,7 @@
 </div>
 
 <object th:fragment="script" th:remove="tag">
-  <script type="text/javascript" th:src="@{/js/workspace/sql-container.js}"></script>
+  <script type="text/javascript" th:src="@{/js/workspace/sql-list.js}"></script>
   <script type="text/javascript" th:src="@{/js/workspace/sql-editor.js}"></script>
   <script type="text/javascript" th:src="@{/js/workspace/processor-adaptor.js}"></script>
   <script type="text/javascript" th:src="@{/js/workspace/main.js}"></script>

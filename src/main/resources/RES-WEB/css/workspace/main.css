@@ -21,34 +21,38 @@
   height: 100%;
 }
 
-#sql-items {
+#sql-list {
   height: 100%;
   border: solid 1px silver;
   overflow-y: scroll;
   padding-top: 10px;
 }
 
-#sql-items .widget {
+#sql-list .widget {
   margin-bottom: 10px;
 }
 
-#sql-items .widget-content {
+#sql-list .widget-content {
   padding: 5px;
 }
 
-#sql-items .sql-item-name {
+#sql-list .sql-item-name {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-#sql-items .sql-sentence {
+#sql-list .sql-sentence {
   height: 20px;
   margin: 0;
   font-size: 11px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.sql-item-save:HOVER, .sql-item-remove:HOVER {
+  color: lime;
 }
 
 /* SQL editor --------------------------------------------------*/

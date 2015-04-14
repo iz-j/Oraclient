@@ -11,6 +11,7 @@ public class ExecutionResult {
 	public boolean query = true;
 
 	public List<ColumnInfo> columns;
+	public List<String> columnIds;
 	public List<List<String>> records;
 
 	public int updatedCount = 0;
@@ -21,6 +22,8 @@ public class ExecutionResult {
 				+ query
 				+ ", columns="
 				+ columns
+				+ ", columnIds="
+				+ columnIds
 				+ ", records="
 				+ records
 				+ ", updatedCount="

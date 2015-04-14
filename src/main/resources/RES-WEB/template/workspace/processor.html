@@ -11,7 +11,13 @@
 <body>
   <input id="connection-id" type="hidden" th:value="${connectionId}" />
 
-  <div id="data-table" class="handsontable"></div>
+  <div id="indicator" style="display: none;">
+    <img th:src="@{/img/indicator.gif}" />
+    <h4>In progress...</h4>
+  </div>
+
+  <div id="data-table" style="display: none;">
+  </div>
 
   <script th:src="@{/lib/app-ui/js/vendor/jquery-2.1.3.min.js}"></script>
   <script th:src="@{/lib/handsontable/handsontable.full.js}"></script>

@@ -55,7 +55,7 @@
             <!-- Brand -->
             <li>
               <div class="themed-background">
-                <a href="index.php" class="sidebar-title">
+                <a class="sidebar-title">
                   <i class="fa fa-database"></i> <span class="sidebar-nav-mini-hide"><strong>Oraclient</strong></span>
                 </a>
               </div>
@@ -63,7 +63,7 @@
             <!-- END Brand -->
             <!-- Page title -->
             <li class="hidden-xs animation-fadeInQuick">
-              <a href="javascript:void(0)" th:text="${_pageTitle}"></a>
+              <a th:text="${_pageTitle}"></a>
             </li>
             <!-- END Page title -->
           </ul>
@@ -71,12 +71,6 @@
 
           <!-- Right Header Navigation -->
           <ul class="nav navbar-nav-custom pull-right">
-            <!-- Config -->
-            <li>
-              <a href="javascript:void(0)"><i class="gi gi-settings"></i></a>
-            </li>
-            <!-- END Config -->
-
             <!-- User Dropdown -->
             <li class="dropdown">
               <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
@@ -98,6 +92,9 @@
                 </li>
               </ul></li>
             <!-- END User Dropdown -->
+            <li th:unless="${'connections'.equals(#strings.toLowerCase(_pageTitle))}">
+              <a href="/connections"><i class="fa fa-sign-out"></i></a>
+            </li>
           </ul>
           <!-- END Right Header Navigation -->
         </header>

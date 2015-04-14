@@ -88,13 +88,13 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 			public ExecutionResult extractData(ResultSet rs) throws SQLException, DataAccessException {
 				final ExecutionResult result = new ExecutionResult();
 				result.columns = new ArrayList<>();
+				result.columnIds = new ArrayList<>();
 				result.records = new ArrayList<>();
 
 				final ResultSetMetaData rsmd = rs.getMetaData();
 				final int columnCount = rsmd.getColumnCount();
 
 				// Extract columns.
-				final List<String> columnStrings = new ArrayList<>();
 				for (int i = 1; i <= columnCount; i++) {
 					final ColumnInfo c = new ColumnInfo();
 					c.columnName = rsmd.getColumnName(i);
@@ -128,9 +128,8 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 						break;
 					}
 					result.columns.add(c);
-					columnStrings.add(c.columnName);
+					result.columnIds.add(c.columnName);
 				}
-				result.records.add(columnStrings);
 
 				// Extract values.
 				while (rs.next()) {
