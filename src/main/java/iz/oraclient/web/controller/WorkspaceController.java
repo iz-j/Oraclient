@@ -72,4 +72,5 @@ public class WorkspaceController {
 		logger.trace("#formatSql sql = {}", sql);
 		return SqlFormatter.format(sql.sentence);
 	}
+
 }

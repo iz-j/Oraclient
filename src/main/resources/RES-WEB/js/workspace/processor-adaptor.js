@@ -55,7 +55,10 @@ var ProcessorAdaptor = function() {
   }
 
   function executeSql(sql) {
-    _callProcessor('execute', sql);
+    Base.blockUI();
+    _callProcessor('execute', sql, function() {
+      Base.unblockUI();
+    });
   }
 
   // PRIVATE --------------------------------------------------
@@ -77,7 +80,13 @@ var ProcessorAdaptor = function() {
       return null;
     }
     var ifrm = _findIframe(_sql.id);
-    return ifrm ? ifrm.contentWindow['Processor'][funcName](opt_arg) : null;
+    if (!ifrm) {
+      return null;
+    }
+    var proc = ifrm.contentWindow['Processor'];
+    return proc[funcName].apply(this, $.map(arguments, function(arg, idx) {
+      return idx > 0 ? arg : null;
+    }));
   }
 
   return {

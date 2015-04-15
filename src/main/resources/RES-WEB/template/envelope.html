@@ -26,6 +26,7 @@
 <link rel="stylesheet" th:href="@{/lib/app-ui/css/main.css}" />
 <link rel="stylesheet" th:href="@{/lib/app-ui/css/themes.css}" />
 <link rel="stylesheet" th:href="@{/lib/app-ui/css/themes/classy.css}" />
+<link rel="stylesheet" th:href="@{/css/base.css}" />
 <link th:substituteby="this :: link" />
 <!-- END Stylesheets -->
 
@@ -111,11 +112,22 @@
   </div>
   <!-- END Page Wrapper -->
 
+  <!-- BlockUI -->
+  <div id="block-ui" style="display: none;">
+    <img src="/img/indicator.gif" />
+    <h4>IN PROGRESS...</h4>
+    <div>
+      <button id="cancel-request" type="button" class="btn btn-effect-ripple btn-danger btn-xs">Cancel</button>
+    </div>
+  </div>
+  <!-- END BlockUI -->
+
   <!-- Bootstrap.js, Jquery plugins and Custom JS code -->
   <script th:src="@{/lib/app-ui/js/vendor/jquery-2.1.3.min.js}"></script>
   <script th:src="@{/lib/app-ui/js/vendor/bootstrap.min.js}"></script>
   <script th:src="@{/lib/app-ui/js/plugins.js}"></script>
   <script th:src="@{/lib/app-ui/js/app.js}"></script>
+  <script th:src="@{/lib/blockui/jquery.blockUI.js}"></script>
 
   <!-- Oraclient base -->
   <script th:src="@{/js/base.js}"></script>

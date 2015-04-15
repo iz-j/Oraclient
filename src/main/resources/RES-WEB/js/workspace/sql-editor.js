@@ -14,7 +14,7 @@ var SqlEditor = function() {
 
   function init() {
     $('#sql-editor').prop('disabled', true).on('input propertychange', _handleTextChange);
-    disableButtons(true);
+    _disableButtons(true);
     $('#btn-format').on('click', _handleFormatClick);
     $('#btn-execute').on('click', _handleExecuteClick);
   }
@@ -23,21 +23,16 @@ var SqlEditor = function() {
     _sql = sql;
     if (_sql) {
       $('#sql-editor').val(sql.sentence).prop('disabled', false).focus();
-      disableButtons(false);
+      _disableButtons(false);
     } else {
       $('#sql-editor').val('').prop('disabled', true);
-      disableButtons(true);
+      _disableButtons(true);
     }
   }
 
   function getSql() {
     _sql.sentence = $('#sql-editor').val();
     return _sql;
-  }
-
-  function disableButtons(disabled) {
-    $('#btn-format').prop('disabled', disabled);
-    $('#btn-execute').prop('disabled', disabled);
   }
 
   function setOnChange(fn) {
@@ -49,6 +44,11 @@ var SqlEditor = function() {
   }
 
   // PRIVATE --------------------------------------------------
+
+  function _disableButtons(disabled) {
+    $('#btn-format').prop('disabled', disabled);
+    $('#btn-execute').prop('disabled', disabled);
+  }
 
   function _handleTextChange(e) {
     _timerId && clearTimeout(_timerId);
@@ -63,7 +63,7 @@ var SqlEditor = function() {
       return;
     }
 
-    disableButtons(true);
+    _disableButtons(true);
     $.ajax({
       url: '/workspace/formatSql',
       type: 'post',
@@ -75,7 +75,7 @@ var SqlEditor = function() {
       $('#sql-editor').val(res);
       _onChange && _onChange(_sql);
     }).always(function() {
-      disableButtons(false);
+      _disableButtons(false);
     });
   }
 
@@ -87,7 +87,6 @@ var SqlEditor = function() {
     'init': init,
     'setSql': setSql,
     'getSql': getSql,
-    'disableButttons': disableButtons,
     'setOnChange': setOnChange,
     'setOnExecute': setOnExecute
   };

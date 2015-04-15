@@ -14,9 +14,17 @@ var Processor = function() {
     console.log('Processor initialized.');
   }
 
-  function execute(sql) {
-    $('#indicator').show();
+  function setPreProcess(fn) {
+    _postProcess = fn;
+  }
+
+  function setPostProcess(fn) {
+    _preProcess = fn;
+  }
+
+  function execute(sql, callback) {
     $('#data-table').hide();
+
     $.ajax({
       url: '/processor/execute/' + _connectionId,
       type: 'post',
@@ -27,7 +35,7 @@ var Processor = function() {
       console.log(res);
       _handsontable(res);
     }).always(function() {
-      $('#indicator').hide();
+      callback && callback();
     });
   };
 

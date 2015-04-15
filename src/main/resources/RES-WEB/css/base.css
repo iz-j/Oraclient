@@ -1,0 +1,17 @@
+#block-ui {
+  padding: 10px;
+}
+
+#block-ui img {
+  vertical-align: middle;
+}
+
+#block-ui h4 {
+  display: inline-block;
+  margin-left: 10px;
+}
+
+#block-ui button {
+  display: inline-block;
+  margin: auto;
+}

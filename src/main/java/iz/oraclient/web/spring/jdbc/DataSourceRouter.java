@@ -58,6 +58,8 @@ public final class DataSourceRouter extends AbstractDataSource {
 		ds.setTestWhileIdle(false);
 		ds.setValidationQuery("SELECT 1 FROM DUAL");
 
+		ds.setJdbcInterceptors(StatementManager.class.getName());
+
 		// Validate
 		try {
 			ds.getConnection().close();
