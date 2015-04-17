@@ -15,7 +15,7 @@
   <logger name="org.springframework" level="INFO" additivity="false">
     <appender-ref ref="FILE" />
   </logger>
-  <logger name="iz.oraclient" level="INFO" additivity="false">
+  <logger name="iz.dbui" level="INFO" additivity="false">
     <appender-ref ref="FILE" />
   </logger>
 </configuration>

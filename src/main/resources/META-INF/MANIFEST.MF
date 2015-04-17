@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 JavaFX-Version: 8.0
-JavaFX-Application-Class: iz.oraclient.OraclientMain
+JavaFX-Application-Class: iz.dbui.DbUiMain
 Created-By: iz-j
 Main-Class: com/javafx/main/Main

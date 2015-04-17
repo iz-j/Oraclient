@@ -9,7 +9,7 @@
   <logger name="org.springframework" level="INFO" additivity="false">
     <appender-ref ref="CONSOLE" />
   </logger>
-  <logger name="iz.oraclient" level="TRACE" additivity="false">
+  <logger name="iz.dbui" level="TRACE" additivity="false">
     <appender-ref ref="CONSOLE" />
   </logger>
 </configuration>

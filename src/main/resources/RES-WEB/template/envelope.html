@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 
-<title th:text="${'Oraclient | ' + _pageTitle}"></title>
+<title th:text="${'DB-UI | ' + _pageTitle}"></title>
 
 <meta name="robots" content="noindex, nofollow" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0" />
@@ -57,7 +57,7 @@
             <li>
               <div class="themed-background">
                 <a class="sidebar-title">
-                  <i class="fa fa-database"></i> <span class="sidebar-nav-mini-hide"><strong>Oraclient</strong></span>
+                  <i class="fa fa-database"></i> <span class="sidebar-nav-mini-hide"><strong>DB-UI</strong></span>
                 </a>
               </div>
             </li>
@@ -129,7 +129,7 @@
   <script th:src="@{/lib/app-ui/js/app.js}"></script>
   <script th:src="@{/lib/blockui/jquery.blockUI.js}"></script>
 
-  <!-- Oraclient base -->
+  <!-- DB-UI base -->
   <script th:src="@{/js/base.js}"></script>
   <!-- Script by each page -->
   <div th:substituteby="this :: script"></div>
