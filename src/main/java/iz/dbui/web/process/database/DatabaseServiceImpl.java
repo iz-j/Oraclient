@@ -8,11 +8,11 @@ import iz.dbui.web.process.database.helper.RowidInjector;
 import iz.dbui.web.process.database.helper.SqlAnalyzer;
 import iz.dbui.web.process.database.helper.SqlAnalyzer.AnalysisResult;
 import iz.dbui.web.spring.jdbc.ConnectionDeterminer;
+import iz.dbui.web.spring.jdbc.DatabaseException;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -42,13 +42,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 		final List<String> tableNames = dbDao.findAllTableNames(ConnectionDeterminer.getCurrentId());
 		logger.trace("{} tables found.", tableNames.size());
 		templates.addAll(tableNames.stream().map(tableName -> {
-			final SqlTemplate t = new SqlTemplate();
-			t.id = UUID.randomUUID().toString();
-			t.type = TemplateType.TABLE;
-			t.tableName = StringUtils.upperCase(tableName);
-			t.name = StringUtils.upperCase(tableName);
-			t.sentence = "SELECT * FROM " + StringUtils.upperCase(tableName) + System.lineSeparator();
-			return t;
+			return SqlTemplate.forTableSql(tableName);
 		}).collect(Collectors.toList()));
 
 		// Retrieve custom registered.
@@ -65,22 +59,28 @@ public class DatabaseServiceImpl implements DatabaseService {
 	}
 
 	@Override
-	public ExecutionResult executeSql(SqlTemplate sql) {
+	public ExecutionResult executeSql(SqlTemplate sql) throws DatabaseException {
 		final AnalysisResult analysisResult = SqlAnalyzer.analyze(sql.sentence);
 
 		try {
 			switch (analysisResult) {
 			case QUERY:
-				return dbDao.executeQuery(RowidInjector.inject(sql.sentence));
+				if (sql.type == TemplateType.TABLE) {
+					final ExecutionResult retval = dbDao.executeQuery(RowidInjector.inject(sql.sentence));
+					retval.hasRowid = true;
+					return retval;
+				} else {
+					return dbDao.executeQuery(sql.sentence);
+				}
 			case EXECUTABLE:
-				return null;
+				return dbDao.executeUpdate(sql.sentence);
 			case OTHER:
-				return null;
+				return dbDao.execute(sql.sentence);
 			default:
 				throw new IllegalStateException("Should not reach here!");
 			}
 		} catch (DataAccessException e) {
-			return null;
+			throw new DatabaseException(e.getMessage(), e);
 		}
 	}
 }

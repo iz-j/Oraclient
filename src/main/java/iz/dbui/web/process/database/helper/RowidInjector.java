@@ -1,9 +1,13 @@
 package iz.dbui.web.process.database.helper;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.foundationdb.sql.StandardException;
+import com.foundationdb.sql.parser.AllResultColumn;
 import com.foundationdb.sql.parser.ColumnReference;
+import com.foundationdb.sql.parser.FromBaseTable;
 import com.foundationdb.sql.parser.NodeTypes;
 import com.foundationdb.sql.parser.QueryTreeNode;
 import com.foundationdb.sql.parser.ResultColumn;
@@ -11,6 +15,7 @@ import com.foundationdb.sql.parser.ResultColumnList;
 import com.foundationdb.sql.parser.SQLParser;
 import com.foundationdb.sql.parser.SelectNode;
 import com.foundationdb.sql.parser.StatementNode;
+import com.foundationdb.sql.parser.TableName;
 import com.foundationdb.sql.parser.Visitable;
 import com.foundationdb.sql.parser.Visitor;
 import com.foundationdb.sql.unparser.NodeToString;
@@ -21,11 +26,13 @@ import com.foundationdb.sql.unparser.NodeToString;
  *
  */
 public final class RowidInjector {
+	private static final Logger logger = LoggerFactory.getLogger(RowidInjector.class);
 
 	private RowidInjector() {
 	}
 
 	public static String inject(String sentence) {
+		logger.trace("#inject");
 		final SQLParser parser = new SQLParser();
 
 		StatementNode stmt = null;
@@ -35,48 +42,70 @@ public final class RowidInjector {
 				throw new IllegalArgumentException("SQL must be SELECT statement!");
 			}
 
-			final SelectColumnsExtractor extractor = new SelectColumnsExtractor();
-			stmt.accept(extractor);
+			final ElementHolder holder = new ElementHolder();
+			stmt.accept(holder);
 
-			injectRowid(extractor.columnList);
+			injectRowid(holder);
 
-			return new NodeToString().toString(stmt);
+			return new NodeToStringEx().toString(stmt);
 
 		} catch (StandardException e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
-	private static void injectRowid(ResultColumnList columnList) {
+	private static void injectRowid(ElementHolder holder) {
 		// XXX Is the correct usage???
 		try {
+			// Add rowid.
 			final ResultColumn rowid = new ResultColumn();
 			rowid.setNodeType(NodeTypes.RESULT_COLUMN);
 			final ColumnReference cr = new ColumnReference();
 			cr.setNodeType(NodeTypes.COLUMN_REFERENCE);
 			cr.init("rowid", null);
 
-			rowid.init("rowid$", cr);
+			rowid.init("rowid_", cr);
 
-			columnList.add(0, rowid);
+			holder.columnList.add(0, rowid);
+
+			// If all result column with no alias exists, add alias.
+			if (holder.allColumn != null && !holder.allColumn.isHavingAlias()) {
+				if (holder.baseTable.getCorrelationName() != null) {
+					final TableName tn = new TableName();
+					tn.init(null, holder.baseTable.getCorrelationName());
+					holder.allColumn.init(tn);
+				} else {
+					holder.allColumn.init(holder.baseTable.getTableName());
+				}
+			}
 
 		} catch (StandardException e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
-	private static class SelectColumnsExtractor implements Visitor {
+	private static class ElementHolder implements Visitor {
 
 		ResultColumnList columnList;
+		AllResultColumn allColumn;
+		FromBaseTable baseTable;
 
 		@Override
 		public Visitable visit(Visitable node) throws StandardException {
-			final QueryTreeNode qn = (QueryTreeNode)node;
+			final QueryTreeNode qn = (QueryTreeNode) node;
 
 			switch (qn.getNodeType()) {
 			case NodeTypes.SELECT_NODE:
-				final SelectNode sn = (SelectNode)node;
+				final SelectNode sn = (SelectNode) node;
 				columnList = sn.getResultColumns();
+				break;
+			case NodeTypes.ALL_RESULT_COLUMN:
+				allColumn = (AllResultColumn) node;
+				logger.trace("AllResultColumn found.");
+				break;
+			case NodeTypes.FROM_BASE_TABLE:
+				baseTable = (FromBaseTable) node;
+				logger.trace("FromBaseTable =  {}.", baseTable.getTableName().getFullTableName());
 				break;
 			default:
 				break;
@@ -92,12 +121,25 @@ public final class RowidInjector {
 
 		@Override
 		public boolean stopTraversal() {
-			return columnList != null;
+			return false;
 		}
 
 		@Override
 		public boolean skipChildren(Visitable node) throws StandardException {
 			return false;
+		}
+	}
+
+	private static class NodeToStringEx extends NodeToString {
+		@Override
+		protected String fromBaseTable(FromBaseTable node) throws StandardException {
+			String tn = toString(node.getOrigTableName());
+			String n = maybeQuote(node.getCorrelationName());
+			if (n == null) {
+				return tn;
+			} else {
+				return tn + " " + n;
+			}
 		}
 	}
 }

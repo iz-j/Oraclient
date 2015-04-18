@@ -10,6 +10,7 @@ import java.util.List;
 public class ExecutionResult {
 	public boolean query = true;
 
+	public boolean hasRowid = false;
 	public List<ColumnInfo> columns;
 	public List<String> columnIds;
 	public List<List<String>> records;
@@ -18,16 +19,7 @@ public class ExecutionResult {
 
 	@Override
 	public String toString() {
-		return "ExecutionResult [query="
-				+ query
-				+ ", columns="
-				+ columns
-				+ ", columnIds="
-				+ columnIds
-				+ ", records="
-				+ records
-				+ ", updatedCount="
-				+ updatedCount
-				+ "]";
+		return "ExecutionResult [query=" + query + ", hasRowid=" + hasRowid + ", columns=" + columns + ", columnIds="
+				+ columnIds + ", records=" + records + ", updatedCount=" + updatedCount + "]";
 	}
 }

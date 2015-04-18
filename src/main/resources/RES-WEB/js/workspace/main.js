@@ -23,6 +23,7 @@ var Workspace = function() {
 
     $(window).on('resize orientationchange', _handleResize).resize();
     _setupSearch();
+    $('#btn-free-sql').on('click', _handleFreeSqlClick);
   }
 
 
@@ -76,18 +77,22 @@ var Workspace = function() {
 
     $('#search-sql').on('change', function(e) {
       $('#search-sql').select2('val', '');
-      $.ajax({
-        url: '/workspace/sqlItemView',
-        type: 'post',
-        dataType: 'html',
-        contentType: 'application/json',
-        data: JSON.stringify(e.added)
-      }).done(function(res) {
-        SqlList.addContent(res);
-      });
+      _getSqlItemView(e.added);
     });
   }
 
+  function _getSqlItemView(sql) {
+    $.ajax({
+      url: '/workspace/sqlItemView',
+      type: 'post',
+      dataType: 'html',
+      contentType: 'application/json',
+      data: sql ? JSON.stringify(sql) : null
+    }).done(function(res) {
+      SqlList.addContent(res);
+    });
+  }
+  
   function _handleSqlListChange(sql) {
     SqlEditor.setSql(sql);
     ProcessorAdaptor.setSql(sql, _connectionId);
@@ -100,6 +105,10 @@ var Workspace = function() {
 
   function _handleSqlEditorExecute(sql) {
     ProcessorAdaptor.executeSql(sql);
+  }
+  
+  function _handleFreeSqlClick() {
+    _getSqlItemView();
   }
 
   return {

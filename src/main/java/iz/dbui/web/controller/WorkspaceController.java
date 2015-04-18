@@ -60,9 +60,12 @@ public class WorkspaceController {
 	}
 
 	@RequestMapping(value = "/sqlItemView", method = RequestMethod.POST)
-	public ModelAndView sqlItemView(@RequestBody SqlTemplate sqlTemplate) {
+	public ModelAndView sqlItemView(@RequestBody(required = false) SqlTemplate sqlTemplate) {
 		logger.trace("#sqlItemView sqlTemplate = {}", sqlTemplate);
 		final ModelAndView mv = new ModelAndView("workspace/sql-item");
+		if (sqlTemplate == null) {
+			sqlTemplate = SqlTemplate.forFreeSql();
+		}
 		mv.addObject("sqls", Arrays.asList(sqlTemplate));
 		return mv;
 	}

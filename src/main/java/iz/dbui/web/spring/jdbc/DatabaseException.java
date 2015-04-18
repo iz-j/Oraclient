@@ -11,6 +11,7 @@ import org.springframework.dao.DataAccessException;
  * @author izumi_j
  *
  */
+@SuppressWarnings("serial")
 public class DatabaseException extends Exception {
 
 	/**

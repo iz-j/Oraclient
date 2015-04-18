@@ -10,13 +10,17 @@
 </head>
 <body>
   <input id="connection-id" type="hidden" th:value="${connectionId}" />
-
-  <div id="indicator" style="display: none;">
-    <img th:src="@{/img/indicator.gif}" />
-    <h4>In progress...</h4>
+  
+  <div id="data-table" style="display: none;"></div>
+  
+  <div id="alert-error" class="alert" style="display: none;">
+    <h4>Error!</h4>
+    <p id="error-message"></p>
   </div>
-
-  <div id="data-table" style="display: none;">
+  
+  <div id="alert-success" class="alert" style="display: none;">
+    <h4>Success</h4>
+    <p id="success-message"></p>
   </div>
 
   <script th:src="@{/lib/app-ui/js/vendor/jquery-2.1.3.min.js}"></script>

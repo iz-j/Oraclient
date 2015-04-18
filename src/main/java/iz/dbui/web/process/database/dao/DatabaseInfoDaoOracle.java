@@ -1,8 +1,8 @@
 package iz.dbui.web.process.database.dao;
 
 import iz.dbui.web.process.database.dto.ColumnInfo;
-import iz.dbui.web.process.database.dto.ExecutionResult;
 import iz.dbui.web.process.database.dto.ColumnInfo.DataType;
+import iz.dbui.web.process.database.dto.ExecutionResult;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -139,9 +139,9 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 						if (value == null) {
 							values.add(StringUtils.EMPTY);
 						} else if (value instanceof java.sql.Date) {
-							values.add(new DateTime(((java.sql.Date)value).getTime()).toString());
+							values.add(new DateTime(((java.sql.Date) value).getTime()).toString());
 						} else if (value instanceof java.sql.Timestamp) {
-							values.add(new DateTime(((java.sql.Timestamp)value).getTime()).toString());
+							values.add(new DateTime(((java.sql.Timestamp) value).getTime()).toString());
 						} else {
 							values.add(value.toString());
 						}
@@ -156,9 +156,21 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 	}
 
 	@Override
-	public int executeDML(String sqlSentence) {
-		logger.trace("#executeDML {}", sqlSentence);
-		return jdbc.update(sqlSentence);
+	public ExecutionResult executeUpdate(String sqlSentence) {
+		logger.trace("#executeUpdate {}", sqlSentence);
+		final ExecutionResult result = new ExecutionResult();
+		result.query = false;
+		result.updatedCount = jdbc.update(sqlSentence);
+		return result;
+	}
+
+	@Override
+	public ExecutionResult execute(String sqlSentence) {
+		logger.trace("#execute {}", sqlSentence);
+		final ExecutionResult result = new ExecutionResult();
+		result.query = false;
+		jdbc.execute(sqlSentence);
+		return result;
 	}
 
 }

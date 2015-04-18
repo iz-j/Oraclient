@@ -1,5 +1,9 @@
 package iz.dbui.web.process.database.dto;
 
+import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
+
 /**
  *
  * @author izumi_j
@@ -7,7 +11,27 @@ package iz.dbui.web.process.database.dto;
  */
 public class SqlTemplate {
 	public enum TemplateType {
-		TABLE, CUSTOM;
+		TABLE, FREE;
+	}
+
+	public static SqlTemplate forFreeSql() {
+		final SqlTemplate t = new SqlTemplate();
+		t.id = UUID.randomUUID().toString();
+		t.type = TemplateType.FREE;
+		t.tableName = "";
+		t.name = "Free SQL";
+		t.sentence = "";
+		return t;
+	}
+
+	public static SqlTemplate forTableSql(String tableName) {
+		final SqlTemplate t = new SqlTemplate();
+		t.id = UUID.randomUUID().toString();
+		t.type = TemplateType.TABLE;
+		t.tableName = StringUtils.upperCase(tableName);
+		t.name = StringUtils.upperCase(tableName);
+		t.sentence = "SELECT * FROM " + StringUtils.upperCase(tableName) + System.lineSeparator();
+		return t;
 	}
 
 	public String id;

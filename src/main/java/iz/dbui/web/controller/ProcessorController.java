@@ -4,6 +4,7 @@ import iz.dbui.web.process.database.DatabaseService;
 import iz.dbui.web.process.database.dto.ExecutionResult;
 import iz.dbui.web.process.database.dto.SqlTemplate;
 import iz.dbui.web.spring.jdbc.ConnectionDeterminer;
+import iz.dbui.web.spring.jdbc.DatabaseException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ public class ProcessorController {
 
 	@RequestMapping(value = "/execute/{connectionId}", method = RequestMethod.POST)
 	public @ResponseBody ExecutionResult execute(@PathVariable("connectionId") String connectionId,
-			@RequestBody SqlTemplate sql) {
+			@RequestBody SqlTemplate sql) throws DatabaseException {
 		logger.trace("#execute {}", sql);
 		ConnectionDeterminer.setId(connectionId);
 		return dbService.executeSql(sql);

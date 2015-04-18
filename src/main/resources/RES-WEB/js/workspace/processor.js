@@ -24,6 +24,8 @@ var Processor = function() {
 
   function execute(sql, callback) {
     $('#data-table').hide();
+    $('#alert-success').hide();
+    $('#alert-error').hide();
 
     $.ajax({
       url: '/processor/execute/' + _connectionId,
@@ -33,9 +35,17 @@ var Processor = function() {
       dataType: 'json'
     }).done(function(res) {
       console.log(res);
-      _handsontable(res);
+      if (res.query) {
+        _handsontable(res);
+      } else {
+        $('#success-message').text(res.updatedCount + ' rows were affected.');
+        $('#alert-success').show();
+      }
     }).always(function() {
       callback && callback();
+    }).fail(function(xhr, status, error) {
+      $('#error-message').text(error);
+      $('#alert-error').show();
     });
   };
 
@@ -73,25 +83,27 @@ var Processor = function() {
       rowHeaders: true,
       contextMenu: true,
       data: res.records,
-      colHeaders: _htColHeaders(res.columnIds),
-      columns: _htColumns(res.columnIds.length),
+      colHeaders: _htColHeaders(res),
+      columns: _htColumns(res),
       width: size['w'],
       height: size['h']
     });
   }
 
-  function _htColHeaders(columnIds) {
-    // Remove rowid
-    columnIds.shift();
-    return columnIds;
+  function _htColHeaders(res) {
+    // Remove rowid if necessary.
+    res.hasRowid && res.columnIds.shift();
+    return res.columnIds;
   }
 
-  function _htColumns(size) {
-    // Hide rowid column.
+  function _htColumns(res) {
+    // Hide rowid column if necessary.
+    // This will be called after _htColHeaders, so rowid has already been removed.
     var columns = [];
-    for (var i = 1; i < size; i++) {
-      columns.push({ 'data': i });
-    }
+    $.each(res.columnIds, function(i, v) {
+      var index = res.hasRowid ? i + 1 : i;
+      columns.push({ 'data': index});
+    });
     return columns;
   }
 

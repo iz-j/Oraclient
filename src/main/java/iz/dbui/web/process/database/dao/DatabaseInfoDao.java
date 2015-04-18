@@ -18,5 +18,7 @@ public interface DatabaseInfoDao {
 
 	ExecutionResult executeQuery(String sqlSentence);
 
-	int executeDML(String sqlSentence);
+	ExecutionResult executeUpdate(String sqlSentence);
+
+	ExecutionResult execute(String sqlSentence);
 }
