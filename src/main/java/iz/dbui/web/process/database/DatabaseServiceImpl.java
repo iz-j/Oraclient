@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,14 +90,16 @@ public class DatabaseServiceImpl implements DatabaseService {
 
 	@Override
 	public void save(LocalChanges changes) throws DatabaseException {
+		final MutableObject<String> rowidHolder = new MutableObject<>();
 		try {
 			final String tableName = changes.tableName;
 			final List<String> columnNames = changes.columnNames;
 
 			// Handle insert and update.
 			changes.editedMap.forEach((rowid, values) -> {
+				rowidHolder.setValue(rowid);
 				String sql;
-				if (StringUtils.startsWith(rowid, "$new")) {
+				if (StringUtils.startsWith(rowid, "new$")) {
 					sql = MergeSqlBuilder.insert(values, tableName, columnNames);
 				} else {
 					sql = MergeSqlBuilder.update(rowid, values, tableName, columnNames);
@@ -106,10 +109,13 @@ public class DatabaseServiceImpl implements DatabaseService {
 
 			// Handle delete.
 			changes.removedRowids.forEach(rowid -> {
+				rowidHolder.setValue(rowid);
 				dbDao.executeUpdate(MergeSqlBuilder.delete(rowid, tableName));
 			});
 		} catch (DataAccessException e) {
-			throw new DatabaseException(e.getMessage(), e);
+			final DatabaseException ex = new DatabaseException(e.getMessage(), e);
+			ex.setRowid(rowidHolder.getValue());
+			throw ex;
 		}
 	}
 }

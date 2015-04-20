@@ -140,10 +140,10 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 						if (value == null) {
 							values.add(StringUtils.EMPTY);
 						} else if (value instanceof java.sql.Date) {
-							final DateTime dt = new DateTime(((java.sql.Date)value).getTime());
+							final DateTime dt = new DateTime(((java.sql.Date) value).getTime());
 							values.add(dt.toString(DateTimeFormat.mediumDate()));
 						} else if (value instanceof java.sql.Timestamp) {
-							final DateTime dt = new DateTime(((java.sql.Timestamp)value).getTime());
+							final DateTime dt = new DateTime(((java.sql.Timestamp) value).getTime());
 							// Omit when time is 00:00:00.
 							if (dt.equals(dt.withTime(0, 0, 0, 0))) {
 								values.add(dt.toString(DateTimeFormat.mediumDate()));

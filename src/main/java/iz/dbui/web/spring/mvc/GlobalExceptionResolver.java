@@ -23,7 +23,9 @@ public class GlobalExceptionResolver implements HandlerExceptionResolver {
 		if (ex instanceof DatabaseException) {
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
 			mv.setView(new MappingJackson2JsonView());
-			mv.addObject("message", ex.getMessage());
+			final DatabaseException dbEx = (DatabaseException) ex;
+			mv.addObject("message", dbEx.getSqlExceptionMessage());
+			mv.addObject("rowid", dbEx.getRowid());
 		} else {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		}

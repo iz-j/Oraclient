@@ -14,11 +14,11 @@ var Base = function() {
       type: opt_type || 'info',
       offset: {
         from: 'top',
-        amount: 60
+        amount: 30
       },
       align: 'right',
       // width: 'auto',
-      delay: 3000,
+      delay: (opt_type == 'danger') ? 10000 : 3000,
       allow_dismiss: true,
       stackup_spacing: 10
     });

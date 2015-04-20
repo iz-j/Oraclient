@@ -78,6 +78,16 @@ var Processor = function() {
       _unblockUI();
     }).fail(function(xhr, status, error) {
       _growl(xhr.responseJSON['message'], 'danger');
+      var rowid = xhr.responseJSON['rowid'];
+      if (rowid) {
+        // Select error row.
+        $.each(_ht.getData(), function(i, data) {
+          if (data[0] == rowid) {
+            _ht.selectCell(i, 0, i, 0, true);
+            return false;
+          }
+        });
+      }
     });
   }
 
@@ -214,7 +224,7 @@ var Processor = function() {
     } else {
       var rowChanged = (rowid in _editedMap);
       $(TD).toggleClass('row-changed', rowChanged);
-      rowChanged && $(TD).toggleClass('cell-changed', (col + 1 in _editedMap[rowid]));
+      rowChanged && $(TD).toggleClass('cell-changed', (col in _editedMap[rowid]));
     }
   }
 
@@ -275,8 +285,8 @@ var Processor = function() {
     window.parent['Base']['unblockUI']();
   }
 
-  function _growl(message) {
-    window.parent['Base']['growl'](message);
+  function _growl(message, opt_type) {
+    window.parent['Base']['growl'](message, opt_type);
   }
 
   return {
