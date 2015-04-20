@@ -2,8 +2,10 @@ package iz.dbui.web.process.database;
 
 import iz.dbui.web.process.database.dao.DatabaseInfoDao;
 import iz.dbui.web.process.database.dto.ExecutionResult;
+import iz.dbui.web.process.database.dto.LocalChanges;
 import iz.dbui.web.process.database.dto.SqlTemplate;
 import iz.dbui.web.process.database.dto.SqlTemplate.TemplateType;
+import iz.dbui.web.process.database.helper.MergeSqlBuilder;
 import iz.dbui.web.process.database.helper.RowidInjector;
 import iz.dbui.web.process.database.helper.SqlAnalyzer;
 import iz.dbui.web.process.database.helper.SqlAnalyzer.AnalysisResult;
@@ -68,6 +70,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 				if (sql.type == TemplateType.TABLE) {
 					final ExecutionResult retval = dbDao.executeQuery(RowidInjector.inject(sql.sentence));
 					retval.hasRowid = true;
+					retval.tableName = sql.tableName;
 					return retval;
 				} else {
 					return dbDao.executeQuery(sql.sentence);
@@ -79,6 +82,32 @@ public class DatabaseServiceImpl implements DatabaseService {
 			default:
 				throw new IllegalStateException("Should not reach here!");
 			}
+		} catch (DataAccessException e) {
+			throw new DatabaseException(e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public void save(LocalChanges changes) throws DatabaseException {
+		try {
+			final String tableName = changes.tableName;
+			final List<String> columnNames = changes.columnNames;
+
+			// Handle insert and update.
+			changes.editedMap.forEach((rowid, values) -> {
+				String sql;
+				if (StringUtils.startsWith(rowid, "$new")) {
+					sql = MergeSqlBuilder.insert(values, tableName, columnNames);
+				} else {
+					sql = MergeSqlBuilder.update(rowid, values, tableName, columnNames);
+				}
+				dbDao.executeUpdate(sql);
+			});
+
+			// Handle delete.
+			changes.removedRowids.forEach(rowid -> {
+				dbDao.executeUpdate(MergeSqlBuilder.delete(rowid, tableName));
+			});
 		} catch (DataAccessException e) {
 			throw new DatabaseException(e.getMessage(), e);
 		}

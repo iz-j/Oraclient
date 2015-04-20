@@ -17,10 +17,28 @@ body {
   font-size: 13px;
 }
 
+.handsontable .row-changed {
+  background-color: #FFFFE0;
+}
+
+.handsontable .row-added {
+  background-color: #E0FFFF;
+}
+
+.handsontable .cell-changed {
+  color: #FF0000;
+}
+
+#status-bar {
+  position: absolute;
+  bottom: 0px;
+  height: 18px;
+  font-size: 11px;
+}
+
 .alert {
   color: white;
-  width: 50%;
-  margin: 10px;
+  max-width: 75%;
   padding: 10px;
   border-radius: 5px;
 }

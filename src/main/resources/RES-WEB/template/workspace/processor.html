@@ -10,14 +10,20 @@
 </head>
 <body>
   <input id="connection-id" type="hidden" th:value="${connectionId}" />
-  
+
   <div id="data-table" style="display: none;"></div>
-  
+  <div id="status-bar">
+    <b id="record-size">0</b> records found.
+    <span>&nbsp;|&nbsp;</span>
+    <b id="modified-rows">0</b> rows changed or added.
+    <b id="removed-rows">0</b> rows removed.
+  </div>
+
   <div id="alert-error" class="alert" style="display: none;">
     <h4>Error!</h4>
     <p id="error-message"></p>
   </div>
-  
+
   <div id="alert-success" class="alert" style="display: none;">
     <h4>Success</h4>
     <p id="success-message"></p>

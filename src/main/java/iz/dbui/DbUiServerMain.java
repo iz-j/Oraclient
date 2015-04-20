@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Launch server directly.
  *
  * @author izumi_j
  *
@@ -16,11 +17,6 @@ public final class DbUiServerMain {
 	private DbUiServerMain() {
 	}
 
-	/**
-	 * Call this to launch your project.
-	 *
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		logger.info("Start via Jetty!");
 		final ViaJetty jetty = new ViaJetty(8888);

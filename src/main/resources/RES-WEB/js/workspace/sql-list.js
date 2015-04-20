@@ -27,7 +27,6 @@ var SqlList = function() {
 
   function updateSql(sql) {
     var a = _find(sql.id);
-    a.attr('data-name', sql.name).attr('data-sentence', sql.sentence);
     a.find('.sql-name').text(sql.name);
     a.find('.sql-sentence').text(sql.sentence);
   }
@@ -63,8 +62,9 @@ var SqlList = function() {
     _onChange(a ? {
       id: a.data('id'),
       type: a.data('type'),
-      name: a.data('name'),
-      sentence: a.data('sentence')
+      tableName: a.data('table-name'),
+      name: a.find('.sql-name').text(),
+      sentence: a.find('.sql-sentence').text()
       } : null);
   }
 

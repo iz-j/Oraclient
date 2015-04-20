@@ -2,6 +2,7 @@ package iz.dbui.web.controller;
 
 import iz.dbui.web.process.database.DatabaseService;
 import iz.dbui.web.process.database.dto.ExecutionResult;
+import iz.dbui.web.process.database.dto.LocalChanges;
 import iz.dbui.web.process.database.dto.SqlTemplate;
 import iz.dbui.web.spring.jdbc.ConnectionDeterminer;
 import iz.dbui.web.spring.jdbc.DatabaseException;
@@ -9,6 +10,8 @@ import iz.dbui.web.spring.jdbc.DatabaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,4 +43,14 @@ public class ProcessorController {
 		ConnectionDeterminer.setId(connectionId);
 		return dbService.executeSql(sql);
 	}
+
+	@RequestMapping(value = "/save/{connectionId}", method = RequestMethod.POST)
+	public ResponseEntity<String> save(@PathVariable("connectionId") String connectionId,
+			@RequestBody LocalChanges changes) throws DatabaseException {
+		logger.trace("#save {}", changes);
+		ConnectionDeterminer.setId(connectionId);
+		dbService.save(changes);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 }

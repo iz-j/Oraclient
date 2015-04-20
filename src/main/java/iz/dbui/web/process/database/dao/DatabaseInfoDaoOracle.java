@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,9 +140,16 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 						if (value == null) {
 							values.add(StringUtils.EMPTY);
 						} else if (value instanceof java.sql.Date) {
-							values.add(new DateTime(((java.sql.Date) value).getTime()).toString());
+							final DateTime dt = new DateTime(((java.sql.Date)value).getTime());
+							values.add(dt.toString(DateTimeFormat.mediumDate()));
 						} else if (value instanceof java.sql.Timestamp) {
-							values.add(new DateTime(((java.sql.Timestamp) value).getTime()).toString());
+							final DateTime dt = new DateTime(((java.sql.Timestamp)value).getTime());
+							// Omit when time is 00:00:00.
+							if (dt.equals(dt.withTime(0, 0, 0, 0))) {
+								values.add(dt.toString(DateTimeFormat.mediumDate()));
+							} else {
+								values.add(dt.toString(DateTimeFormat.mediumDateTime()));
+							}
 						} else {
 							values.add(value.toString());
 						}

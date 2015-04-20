@@ -11,6 +11,7 @@ var ProcessorAdaptor = function() {
 
   function init(connectionId) {
     _connectionId = connectionId;
+    $('#btn-save').on('click', _handleSaveClick);
   }
 
   function setSql(sql) {
@@ -55,10 +56,7 @@ var ProcessorAdaptor = function() {
   }
 
   function executeSql(sql) {
-    Base.blockUI();
-    _callProcessor('execute', sql, function() {
-      Base.unblockUI();
-    });
+    _callProcessor('execute', sql);
   }
 
   // PRIVATE --------------------------------------------------
@@ -87,6 +85,10 @@ var ProcessorAdaptor = function() {
     return proc[funcName].apply(this, $.map(arguments, function(arg, idx) {
       return idx > 0 ? arg : null;
     }));
+  }
+
+  function _handleSaveClick() {
+    _callProcessor('save');
   }
 
   return {
