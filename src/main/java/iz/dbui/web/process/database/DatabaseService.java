@@ -7,6 +7,8 @@ import iz.dbui.web.spring.jdbc.DatabaseException;
 
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
+
 /**
  *
  * @author izumi_j
@@ -18,5 +20,6 @@ public interface DatabaseService {
 
 	ExecutionResult executeSql(SqlTemplate sql) throws DatabaseException;
 
+	@Transactional(rollbackFor = { DatabaseException.class })
 	void save(LocalChanges changes) throws DatabaseException;
 }

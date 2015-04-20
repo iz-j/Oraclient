@@ -50,9 +50,11 @@ var Processor = function() {
 
   function save() {
     if (!_hasRowid) {
+      _growl('This view is read only.');
       return;
     }
-    if (!_editedMap) {
+    if (Object.keys(_editedMap).length == 0) {
+      _growl('There are no changes.');
       return;
     }
 
@@ -66,8 +68,7 @@ var Processor = function() {
         columnNames: _ht.getSettings().colHeaders,
         editedMap: _editedMap,
         removedRowids: _removedRowids
-      }),
-      dataType: 'json'
+      })
     }).done(function(res) {
       _editedMap = {};
       _removedRowids = [];

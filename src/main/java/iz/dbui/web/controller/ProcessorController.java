@@ -10,8 +10,6 @@ import iz.dbui.web.spring.jdbc.DatabaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,12 +43,12 @@ public class ProcessorController {
 	}
 
 	@RequestMapping(value = "/save/{connectionId}", method = RequestMethod.POST)
-	public ResponseEntity<String> save(@PathVariable("connectionId") String connectionId,
+	public @ResponseBody String save(@PathVariable("connectionId") String connectionId,
 			@RequestBody LocalChanges changes) throws DatabaseException {
 		logger.trace("#save {}", changes);
 		ConnectionDeterminer.setId(connectionId);
 		dbService.save(changes);
-		return new ResponseEntity<>(HttpStatus.OK);
+		return "Success";
 	}
 
 }
