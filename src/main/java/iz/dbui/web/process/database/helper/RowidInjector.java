@@ -25,6 +25,7 @@ import com.foundationdb.sql.unparser.NodeToString;
  * @author izumi_j
  *
  */
+@Deprecated
 public final class RowidInjector {
 	private static final Logger logger = LoggerFactory.getLogger(RowidInjector.class);
 
@@ -92,19 +93,19 @@ public final class RowidInjector {
 
 		@Override
 		public Visitable visit(Visitable node) throws StandardException {
-			final QueryTreeNode qn = (QueryTreeNode) node;
+			final QueryTreeNode qn = (QueryTreeNode)node;
 
 			switch (qn.getNodeType()) {
 			case NodeTypes.SELECT_NODE:
-				final SelectNode sn = (SelectNode) node;
+				final SelectNode sn = (SelectNode)node;
 				columnList = sn.getResultColumns();
 				break;
 			case NodeTypes.ALL_RESULT_COLUMN:
-				allColumn = (AllResultColumn) node;
+				allColumn = (AllResultColumn)node;
 				logger.trace("AllResultColumn found.");
 				break;
 			case NodeTypes.FROM_BASE_TABLE:
-				baseTable = (FromBaseTable) node;
+				baseTable = (FromBaseTable)node;
 				logger.trace("FromBaseTable =  {}.", baseTable.getTableName().getFullTableName());
 				break;
 			default:

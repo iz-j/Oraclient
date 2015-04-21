@@ -7,6 +7,8 @@ import iz.dbui.web.process.database.dto.SqlTemplate;
 import iz.dbui.web.spring.jdbc.ConnectionDeterminer;
 import iz.dbui.web.spring.jdbc.DatabaseException;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,12 +45,11 @@ public class ProcessorController {
 	}
 
 	@RequestMapping(value = "/save/{connectionId}", method = RequestMethod.POST)
-	public @ResponseBody String save(@PathVariable("connectionId") String connectionId,
+	public @ResponseBody Map<String, String> save(@PathVariable("connectionId") String connectionId,
 			@RequestBody LocalChanges changes) throws DatabaseException {
 		logger.trace("#save {}", changes);
 		ConnectionDeterminer.setId(connectionId);
-		dbService.save(changes);
-		return "Success";
+		return dbService.save(changes);
 	}
 
 }

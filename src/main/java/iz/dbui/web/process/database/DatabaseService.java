@@ -6,6 +6,7 @@ import iz.dbui.web.process.database.dto.SqlTemplate;
 import iz.dbui.web.spring.jdbc.DatabaseException;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,5 +22,5 @@ public interface DatabaseService {
 	ExecutionResult executeSql(SqlTemplate sql) throws DatabaseException;
 
 	@Transactional(rollbackFor = { DatabaseException.class })
-	void save(LocalChanges changes) throws DatabaseException;
+	Map<String, String> save(LocalChanges changes) throws DatabaseException;
 }

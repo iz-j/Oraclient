@@ -5,6 +5,7 @@ html {
 body {
   height: 100%;
   margin: 0;
+  font-size: 13px;
 }
 
 #data-table {
@@ -14,7 +15,6 @@ body {
 }
 
 .handsontable {
-  font-size: 13px;
 }
 
 .handsontable .row-changed {
@@ -27,6 +27,12 @@ body {
 
 .handsontable .cell-changed {
   color: #FF0000;
+}
+
+#add-first-row {
+  position: absolute;
+  left: 50px;
+  top: 30px;
 }
 
 #status-bar {

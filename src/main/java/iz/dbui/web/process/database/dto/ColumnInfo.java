@@ -17,7 +17,6 @@ public final class ColumnInfo {
 	public String tableName;
 	public String columnName;
 	public DataType dataType;
-	public long columnId;
 	public String comments;
 
 	@Override
@@ -30,8 +29,6 @@ public final class ColumnInfo {
 				+ columnName
 				+ ", dataType="
 				+ dataType
-				+ ", columnId="
-				+ columnId
 				+ ", comments="
 				+ comments
 				+ "]";

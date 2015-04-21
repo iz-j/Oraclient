@@ -2,7 +2,6 @@ package iz.dbui.web.process.database.dao;
 
 import iz.dbui.web.process.database.dto.ColumnInfo;
 import iz.dbui.web.process.database.dto.ColumnInfo.DataType;
-import iz.dbui.web.process.database.dto.ExecutionResult;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -12,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
@@ -44,11 +45,21 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 				+ " ORDER BY A.COLUMN_ID";
 	}
 
+	private static final String SEL_PRIMARY_KEYS;
+	static {
+		SEL_PRIMARY_KEYS = "SELECT T.COLUMN_NAME FROM USER_CONS_COLUMNS T"
+				+ " WHERE T.TABLE_NAME = ?"
+				+ " AND T.CONSTRAINT_NAME IN ("
+				+ " SELECT CONSTRAINT_NAME FROM USER_CONSTRAINTS"
+				+ " WHERE TABLE_NAME = T.TABLE_NAME"
+				+ " AND CONSTRAINT_TYPE = 'P')";
+	}
+
 	@Autowired
 	private JdbcTemplate jdbc;
 
 	@Override
-	@Cacheable(value = "tableNames", key = "#connectionId")
+	@Cacheable(value = "database", key = "#connectionId")
 	public List<String> findAllTableNames(String connectionId) {
 		logger.trace("#findAllTableNames");
 		return jdbc.query(SEL_ALL_TABLES, new RowMapper<String>() {
@@ -61,6 +72,7 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 	}
 
 	@Override
+	@Cacheable(value = "database", key = "#connectionId.concat(':cols:').concat(#tableName)")
 	public List<ColumnInfo> findColumnsBy(String connectionId, String tableName) {
 		logger.trace("#findColumnsBy");
 		return jdbc.query(SEL_ALL_TAB_COLUMNS, new RowMapper<ColumnInfo>() {
@@ -71,8 +83,7 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 				c.owner = rs.getString("OWNER");
 				c.tableName = rs.getString("TABLE_NAME");
 				c.columnName = rs.getString("COLUMN_NAME");
-				c.dataType = DataType.STRING;// TODO
-				c.columnId = rs.getLong("COLUMN_ID");
+				c.dataType = toDataType(rs.getString("DATA_TYPE"));
 				c.comments = rs.getString("COMMENTS");
 				return c;
 			}
@@ -80,17 +91,51 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 	}
 
 	@Override
-	public ExecutionResult executeQuery(String sqlSentence) {
-		logger.trace("#executeQuery {}", sqlSentence);
-
-		return jdbc.query(sqlSentence, new ResultSetExtractor<ExecutionResult>() {
+	@Cacheable(value = "database", key = "#connectionId.concat(':pks:').concat(#tableName)")
+	public List<String> findPrimaryKeysBy(String connectionId, String tableName) {
+		logger.trace("#findPrimaryKeysBy");
+		return jdbc.query(SEL_PRIMARY_KEYS, new RowMapper<String>() {
 
 			@Override
-			public ExecutionResult extractData(ResultSet rs) throws SQLException, DataAccessException {
-				final ExecutionResult result = new ExecutionResult();
-				result.columns = new ArrayList<>();
-				result.columnIds = new ArrayList<>();
-				result.records = new ArrayList<>();
+			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
+				return rs.getString(1);
+			}
+		}, tableName);
+	}
+
+	private DataType toDataType(String oracleDataType) {
+		switch (oracleDataType) {
+		case "VARCHAR2":
+		case "NVARCHAR2":
+		case "CHAR":
+		case "NCHAR":
+			return DataType.STRING;
+		case "NUMBER":
+		case "BINARY_FLOAT":
+		case "BINARY_DOUBLE":
+			return DataType.NUMBER;
+		case "DATE":
+		case "TIMESTAMP":
+		case "TIMESTAMP WITH TIMEZONE":
+		case "TIMESTAMP WITH LOCAL TIMEZONE":
+			return DataType.DATE;
+		default:
+			logger.debug("Unsupported type -> {}", oracleDataType);
+			return DataType.OTHER;
+		}
+	}
+
+	@Override
+	public Pair<List<ColumnInfo>, List<List<String>>> executeQuery(String sqlSentence) {
+		logger.trace("#executeQuery {}", sqlSentence);
+
+		return jdbc.query(sqlSentence, new ResultSetExtractor<Pair<List<ColumnInfo>, List<List<String>>>>() {
+
+			@Override
+			public Pair<List<ColumnInfo>, List<List<String>>> extractData(ResultSet rs) throws SQLException,
+					DataAccessException {
+				final List<ColumnInfo> columns = new ArrayList<>();
+				final List<List<String>> records = new ArrayList<>();
 
 				final ResultSetMetaData rsmd = rs.getMetaData();
 				final int columnCount = rsmd.getColumnCount();
@@ -128,8 +173,7 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 						c.dataType = DataType.OTHER;
 						break;
 					}
-					result.columns.add(c);
-					result.columnIds.add(c.columnName);
+					columns.add(c);
 				}
 
 				// Extract values.
@@ -140,10 +184,10 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 						if (value == null) {
 							values.add(StringUtils.EMPTY);
 						} else if (value instanceof java.sql.Date) {
-							final DateTime dt = new DateTime(((java.sql.Date) value).getTime());
+							final DateTime dt = new DateTime(((java.sql.Date)value).getTime());
 							values.add(dt.toString(DateTimeFormat.mediumDate()));
 						} else if (value instanceof java.sql.Timestamp) {
-							final DateTime dt = new DateTime(((java.sql.Timestamp) value).getTime());
+							final DateTime dt = new DateTime(((java.sql.Timestamp)value).getTime());
 							// Omit when time is 00:00:00.
 							if (dt.equals(dt.withTime(0, 0, 0, 0))) {
 								values.add(dt.toString(DateTimeFormat.mediumDate()));
@@ -154,31 +198,25 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 							values.add(value.toString());
 						}
 					}
-					result.records.add(values);
+					records.add(values);
 				}
 
-				return result;
+				return new ImmutablePair<List<ColumnInfo>, List<List<String>>>(columns, records);
 			}
 
 		});
 	}
 
 	@Override
-	public ExecutionResult executeUpdate(String sqlSentence) {
+	public int executeUpdate(String sqlSentence) {
 		logger.trace("#executeUpdate {}", sqlSentence);
-		final ExecutionResult result = new ExecutionResult();
-		result.query = false;
-		result.updatedCount = jdbc.update(sqlSentence);
-		return result;
+		return jdbc.update(sqlSentence);
 	}
 
 	@Override
-	public ExecutionResult execute(String sqlSentence) {
+	public void execute(String sqlSentence) {
 		logger.trace("#execute {}", sqlSentence);
-		final ExecutionResult result = new ExecutionResult();
-		result.query = false;
 		jdbc.execute(sqlSentence);
-		return result;
 	}
 
 }

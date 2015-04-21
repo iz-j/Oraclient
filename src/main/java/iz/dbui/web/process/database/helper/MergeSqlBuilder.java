@@ -1,5 +1,7 @@
 package iz.dbui.web.process.database.helper;
 
+import iz.dbui.web.process.database.dto.ColumnInfo;
+
 import java.util.List;
 import java.util.Map;
 
@@ -15,26 +17,34 @@ public final class MergeSqlBuilder {
 	private MergeSqlBuilder() {
 	}
 
-	public static String insert(Map<Integer, String> source, String tableName, List<String> columnNames) {
+	/**
+	 * @param source
+	 *            key = columnIndex, value = insert value
+	 * @param tableName
+	 * @param columns
+	 * @return INSERT
+	 */
+	public static String insert(Map<Integer, String> source, String tableName, List<ColumnInfo> columns) {
 		final StringBuilder sql = new StringBuilder();
 		sql.append("INSERT INTO ").append(tableName).append(" (");
 
 		final int before1 = sql.length();
-		source.forEach((columnIndex, value) -> {
+		columns.forEach((column) -> {
 			if (before1 < sql.length()) {
 				sql.append(", ");
 			}
-			sql.append(columnNames.get(columnIndex));
+			sql.append(column.columnName);
 		});
 
 		sql.append(") VALUES (");
 
 		final int before2 = sql.length();
-		source.forEach((columnIndex, value) -> {
+		columns.forEach((column) -> {
 			if (before2 < sql.length()) {
 				sql.append(", ");
 			}
-			sql.append(toSqlVal(value));
+			final int index = columns.indexOf(column);
+			sql.append(toSqlVal(source.get(index)));
 		});
 
 		sql.append(")");
@@ -42,30 +52,73 @@ public final class MergeSqlBuilder {
 		return sql.toString();
 	}
 
-	public static String update(String rowid, Map<Integer, String> source, String tableName, List<String> columnNames) {
+	/**
+	 *
+	 * @param keys
+	 * @param source
+	 *            key = columnIndex, value = update value
+	 * @param tableName
+	 * @param columns
+	 * @param pks
+	 * @return UPDATE
+	 */
+	public static String update(List<String> keys, Map<Integer, String> source, String tableName,
+			List<ColumnInfo> columns, List<String> pks) {
 		final StringBuilder sql = new StringBuilder();
 		sql.append("UPDATE ").append(tableName).append(" SET ");
 
-		final int before = sql.length();
+		final int before1 = sql.length();
 		source.forEach((columnIndex, value) -> {
-			if (before < sql.length()) {
+			if (before1 < sql.length()) {
 				sql.append(", ");
 			}
-			sql.append(columnNames.get(columnIndex)).append(" = ").append(toSqlVal(value));
+			final ColumnInfo column = columns.get(columnIndex);
+			sql.append(column.columnName).append(" = ").append(toSqlVal(value));
 		});
 
-		sql.append(" WHERE ROWID = ").append(toSqlVal(rowid));
+		sql.append(" WHERE ");
+
+		final List<Integer> pkIndexes = ColumnInfoHelper.primaryKeyIndexes(columns, pks);
+		final int before2 = sql.length();
+		keys.forEach(key -> {
+			if (before2 < sql.length()) {
+				sql.append(" AND ");
+			}
+
+			// keys and pkIndexes are same order!
+				final int columnIndex = pkIndexes.get(keys.indexOf(key));
+
+				final ColumnInfo column = columns.get(columnIndex);
+				sql.append(column.columnName).append(" = ").append(toSqlVal(key));
+		});
 
 		return sql.toString();
 	}
 
-	public static String delete(String rowid, String tableName) {
-		return new StringBuilder()
-		.append("DELETE FROM ")
-		.append(tableName)
-		.append(" WHERE ROWID = ")
-		.append(toSqlVal(rowid))
-		.toString();
+	/**
+	 * @param keys
+	 * @param tableName
+	 * @param columns
+	 * @param pks
+	 * @return DELETE
+	 */
+	public static String delete(List<String> keys, String tableName, List<ColumnInfo> columns, List<String> pks) {
+		final StringBuilder sql = new StringBuilder().append("DELETE FROM ").append(tableName).append(" WHERE ");
+
+		final List<Integer> pkIndexes = ColumnInfoHelper.primaryKeyIndexes(columns, pks);
+		final int before = sql.length();
+		keys.forEach(key -> {
+			if (before < sql.length()) {
+				sql.append(" AND ");
+			}
+
+			final int columnIndex = pkIndexes.get(keys.indexOf(key));
+
+			final ColumnInfo column = columns.get(columnIndex);
+			sql.append(column.columnName).append(" = ").append(toSqlVal(key));
+		});
+
+		return sql.toString();
 	}
 
 	private static String toSqlVal(String value) {

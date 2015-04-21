@@ -7,17 +7,9 @@
 
   <diskStore path="java.io.tmpdir"/>
 
-  <cache name="tableNames"
+  <cache name="database"
     maxEntriesLocalHeap="10000"
     eternal="true"
-    overflowToDisk="false">
-  </cache>
-
-  <cache name="databaseInfo"
-    maxEntriesLocalHeap="10000"
-    eternal="false"
-    timeToIdleSeconds="300"
-    timeToLiveSeconds="300"
     overflowToDisk="false">
   </cache>
 

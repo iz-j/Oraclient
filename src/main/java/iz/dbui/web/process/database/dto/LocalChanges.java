@@ -3,18 +3,31 @@ package iz.dbui.web.process.database.dto;
 import java.util.List;
 import java.util.Map;
 
-public class LocalChanges {
+public final class LocalChanges {
+	/**
+	 * Name of table that be edited.
+	 */
 	public String tableName;
-	public List<String> columnNames;
+	/**
+	 * Column names of table that be edited.
+	 */
+	public List<ColumnInfo> columns;
+	/**
+	 * Edited values.<br>
+	 * [key = rowid for local, value = Map[key = column index, value = new value]]
+	 */
 	public Map<String, Map<Integer, String>> editedMap;
+	/**
+	 * Removed rowids.
+	 */
 	public List<String> removedRowids;
 
 	@Override
 	public String toString() {
 		return "LocalChanges [tableName="
 				+ tableName
-				+ ", columnNames="
-				+ columnNames
+				+ ", columns="
+				+ columns
 				+ ", editedMap="
 				+ editedMap
 				+ ", removedRowids="

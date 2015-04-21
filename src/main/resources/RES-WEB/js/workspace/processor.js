@@ -5,7 +5,7 @@ var Processor = function() {
   var _resizeTimerId = null;
   var _renderTimerId = null;
 
-  var _hasRowid = false;
+  var _editable = false;
   var _tableName = null;
   var _dbColumns = null;
   var _editedMap = null;
@@ -18,10 +18,12 @@ var Processor = function() {
   function init() {
     _connectionId = $('#connection-id').val();
     $(window).on('resize orientationchange', _handleResize).resize();
+    $('#add-first-row').on('click', _handleAddFirstRowClick);
   }
 
   function execute(sql) {
     $('#data-table').hide();
+    $('#add-first-row').hide();
     $('#alert-success').hide();
     $('#alert-error').hide();
     _clearData();
@@ -38,22 +40,22 @@ var Processor = function() {
         _handsontable(res);
       } else {
         $('#success-message').text(res.updatedCount + ' rows were affected.');
-        $('#alert-success').show();
+        $('#alert-success').show('slow');
       }
     }).always(function() {
       _unblockUI();
     }).fail(function(xhr, status, error) {
       $('#error-message').text(xhr.responseJSON['message']);
-      $('#alert-error').show();
+      $('#alert-error').show('slow');
     });
   }
 
   function save() {
-    if (!_hasRowid) {
+    if (!_editable) {
       _growl('This view is read only.');
       return;
     }
-    if (Object.keys(_editedMap).length == 0) {
+    if (Object.keys(_editedMap).length == 0 && _removedRowids.length == 0) {
       _growl('There are no changes.');
       return;
     }
@@ -65,11 +67,20 @@ var Processor = function() {
       contentType: 'application/json',
       data: JSON.stringify({
         tableName: _tableName,
-        columnNames: _ht.getSettings().colHeaders,
+        columns: _dbColumns,
         editedMap: _editedMap,
         removedRowids: _removedRowids
       })
     }).done(function(res) {
+      // Merge new rowid.
+      $.each(_ht.getData(), function(i, data) {
+        var oldRowid = data[0];
+        var newRowid = res[oldRowid];
+        if (newRowid) {
+          data[0] = newRowid;
+        }
+      });
+      // Clear and notify.
       _editedMap = {};
       _removedRowids = [];
       _ht.render();
@@ -77,17 +88,29 @@ var Processor = function() {
     }).always(function() {
       _unblockUI();
     }).fail(function(xhr, status, error) {
-      _growl(xhr.responseJSON['message'], 'danger');
-      var rowid = xhr.responseJSON['rowid'];
-      if (rowid) {
+      var message = null;
+      if (xhr.responseJSON) {
         // Select error row.
-        $.each(_ht.getData(), function(i, data) {
-          if (data[0] == rowid) {
-            _ht.selectCell(i, 0, i, 0, true);
-            return false;
-          }
-        });
+        var rowid = xhr.responseJSON['rowid'];
+        var errorRow = -1;
+        if (rowid) {
+          $.each(_ht.getData(), function(i, data) {
+            if (data[0] == rowid) {
+              _ht.selectCell(i, 0, i, 0, true);
+              errorRow = i;
+              return false;
+            }
+          });
+        }
+        // Show error.
+        message = xhr.responseJSON['message'];
+        if (errorRow > -1) {
+          message = '[Row = ' + (errorRow + 1) + '] ' + message;
+        }
+      } else {
+        message = xhr.responseText;
       }
+      _growl(message, 'danger');
     });
   }
 
@@ -119,29 +142,33 @@ var Processor = function() {
   }
 
   function _handsontable(res) {
+    // Initialize.
     $('#data-table').show();
     _ht && _ht.destroy();
     _ht = null;
 
     $('#record-size').text(res.records.length);
-    _hasRowid = res.hasRowid;
+    _editable = res.editable;
     _tableName = res.tableName;
     _dbColumns = res.columns;
     _editedMap = {};
     _removedRowids = [];
+    if (_editable && res.records.length == 0) {
+      $('#add-first-row').show();
+    }
 
+    // Handsontable.
     var size = _calculateTableSize();
     _ht = new Handsontable(document.getElementById('data-table'), {
       data: res.records,
       rowHeaders: true,
-      colHeaders: _htColHeaders(res),
+      colHeaders: res.columnNames,
       columns: _htColumns(res),
       width: size['w'],
       height: size['h'],
       contextMenu: _htContextMenu(),
       undo: false,
-      minSpareRows: 2,
-      readOnly: !_hasRowid,
+      readOnly: !_editable,
       readOnlyCellClassName: null,
       afterChange: _htAfterChange,
       afterRender: _htAfterRender,
@@ -150,21 +177,11 @@ var Processor = function() {
     });
   }
 
-  function _htColHeaders(res) {
-    // Remove rowid if necessary.
-    _hasRowid && res.columnIds.shift();
-    return res.columnIds;
-  }
-
   function _htColumns(res) {
     var columns = [];
     $.each(res.columns, function(i, c) {
-      // Hide rowid column if necessary.
-      if (_hasRowid && i == 0) {
-        return undefined;
-      }
       columns.push({
-        data: i,
+        data: i + 1,// Increment to hide rowid column.
         renderer: _htRenderer
       });
     });
@@ -172,11 +189,26 @@ var Processor = function() {
   }
 
   function _htContextMenu() {
-    return _hasRowid ? ['row_above', 'row_below', 'remove_row'] : false;
+    var isDisabled = function() {
+      // Avoid error about context menu clicked when no rows.
+      return (!_editable) || (_ht.countRows() == 0);
+    }
+
+    return {
+      callback: function(key, options) {
+
+      },
+      items: {
+        'row_above': { disabled: isDisabled },
+        'row_below': { disabled: isDisabled },
+        'remove_row': { disabled: isDisabled },
+        'hsep1': '---------'
+      }
+    };
   }
 
   function _htAfterChange(changes, source) {
-    if (!_hasRowid) {
+    if (!_editable) {
       return;
     }
     if (source != 'edit' && source != 'autofill' && source != 'paste') {
@@ -209,19 +241,19 @@ var Processor = function() {
   function _htRenderer(instance, TD, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     // text-align.
-    var dbCol = _hasRowid ? _dbColumns[col + 1] : _dbColumns[col];
+    var dbCol = _dbColumns[col];
     if ('NUMBER' == dbCol['dataType']) {
       TD.style.textAlign = 'right';
     }
-    // Change row & cell color if edited.
-    if (!_hasRowid) {
+    // Change row & cell color.
+    if (!_editable) {
       return;
     }
     var data = instance.getSourceDataAtRow(row);
     var rowid = data[0];
-    if (_isNewRowid(rowid)) {
-      $(TD).toggleClass('row-added', true);
-    } else {
+    var isNewRow = _isNewRowid(rowid);
+    $(TD).toggleClass('row-added', isNewRow);
+    if (!isNewRow) {
       var rowChanged = (rowid in _editedMap);
       $(TD).toggleClass('row-changed', rowChanged);
       rowChanged && $(TD).toggleClass('cell-changed', (col in _editedMap[rowid]));
@@ -229,10 +261,13 @@ var Processor = function() {
   }
 
   function _htAfterRender(isForced) {
-    // Show edited number.
-    if (_hasRowid) {
+    // Show edited number and some control.
+    if (_editable) {
       $('#modified-rows').text(Object.keys(_editedMap).length);
       $('#removed-rows').text(_removedRowids.length);
+      if (_ht && _ht.countRows() == 0) {
+        $('#add-first-row').show();
+      }
     }
   }
 
@@ -251,6 +286,9 @@ var Processor = function() {
   function _htBeforeRemoveRow(index, amount) {
     var data = _ht.getSourceDataAtRow(index);
     var rowid = data[0];
+    if (!rowid) {
+      return;// This is spare row.
+    }
     // Remember rowid of removed row.
     if (!_isNewRowid(rowid)) {
       _removedRowids.push(rowid);
@@ -260,7 +298,7 @@ var Processor = function() {
   }
 
   function _clearData() {
-    _hasRowid = false;
+    _editable = false;
     _tableName = null;
     _dbColumns = null;
     _editedMap = null;
@@ -274,7 +312,12 @@ var Processor = function() {
   }
 
   function _isNewRowid(rowid) {
-    return rowid && rowid.lastIndexOf('new$', 0) == 0;
+    return (rowid) && (rowid.lastIndexOf('new$', 0) == 0);
+  }
+
+  function _handleAddFirstRowClick() {
+    _ht && _ht.alter('insert_row');
+    $('#add-first-row').hide();
   }
 
   function _blockUI() {
