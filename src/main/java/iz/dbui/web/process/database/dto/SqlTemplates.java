@@ -2,8 +2,7 @@ package iz.dbui.web.process.database.dto;
 
 import iz.dbui.base.AppData;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -12,22 +11,22 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author izumi_j
  *
  */
-@XmlRootElement(name = "templates")
+@XmlRootElement
 public final class SqlTemplates implements AppData {
 
-	private List<SqlTemplate> list = new ArrayList<>();
+	private HashMap<String, SqlTemplate> templates = new HashMap<>();
 
-	public List<SqlTemplate> getList() {
-		return list;
+	public HashMap<String, SqlTemplate> getTemplates() {
+		return templates;
 	}
 
-	public void setList(List<SqlTemplate> list) {
-		this.list = list;
+	public void setTemplates(HashMap<String, SqlTemplate> templates) {
+		this.templates = templates;
 	}
 
 	@Override
 	public String toString() {
-		return "SqlTemplates [list=" + list + "]";
+		return "SqlTemplates [templates=" + templates + "]";
 	}
 
 }

@@ -31,7 +31,7 @@ public class Sandbox {
 
 	@Test
 	public void deleteConnections() {
-		AppDataManager.delete(Connections.class);
+		// AppDataManager.delete(Connections.class);
 	}
 
 	@Test
@@ -40,4 +40,5 @@ public class Sandbox {
 		final ObjectMapper mapper = new ObjectMapper();
 		logger.debug(mapper.writeValueAsString(pair));
 	}
+
 }

@@ -24,6 +24,10 @@
             title="" data-toggle="tooltip" data-original-title="Save these as composite">
             <i class="fa fa-bookmark-o"></i>
           </button>
+          <button id="btn-clear-cache" class="btn btn-danger btn-effect-ripple btn-xs"
+            title="" data-toggle="tooltip" data-original-title="Clear cache">
+            <i class="fa fa-refresh"></i>
+          </button>
         </div>
      </div>
   </div>
@@ -37,7 +41,7 @@
   </div>
   <!-- END List of SQLs -->
 
-  <!-- Workspace -->
+  <!-- Main workspace -->
   <div id="workspace" class="row">
     <!-- SQL Editor -->
     <div id="sql-editor-root" class="col-lg1 col-sm-4">
@@ -51,7 +55,7 @@
           <i class="fa fa-bolt"></i>
         </button>
       </div>
-      <textarea id="sql-editor" class="form-control" style="resize: none;" wrap="off" placeholder="SQL sentence..."></textarea>
+      <textarea id="sql-editor" class="form-control" wrap="off" placeholder="SQL sentence..."></textarea>
     </div>
     <!-- END SQL Editor -->
     <!-- Processor adaptor -->
@@ -66,10 +70,44 @@
     </div>
     <!-- END Processor adaptor -->
   </div>
-  <!-- END Workspace -->
+  <!-- END Main workspace -->
+
+  <!-- Naming Dialog -->
+  <div id="naming-dialog" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 class="modal-title">
+            <strong>Enter name</strong>
+          </h3>
+        </div>
+        <div class="modal-body">
+          <form id="naming-form" class="form-horizontal form-bordered">
+            <div class="form-group">
+              <div class="col-md-6 col-md-offset 3">
+                <input type="text" id="naming-value" class="form-control" placeholder="..." />
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="naming-ok" class="btn btn-effect-ripple btn-primary">OK</button>
+          <button type="button" class="btn btn-effect-ripple btn-danger" data-dismiss="modal">
+            <span class="btn-ripple animate"></span>Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- END Connection Dialog -->
+
+  <div id="for-textcomplete"></div>
 </div>
 
 <object th:fragment="script" th:remove="tag">
+  <script type="text/javascript" th:src="@{/lib/textcomplete/jquery.textcomplete.js}"></script>
+  <script type="text/javascript" th:src="@{/js/workspace/naming-dialog.js}"></script>
   <script type="text/javascript" th:src="@{/js/workspace/sql-list.js}"></script>
   <script type="text/javascript" th:src="@{/js/workspace/sql-editor.js}"></script>
   <script type="text/javascript" th:src="@{/js/workspace/processor-adaptor.js}"></script>

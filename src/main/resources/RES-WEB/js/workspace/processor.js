@@ -44,10 +44,7 @@ var Processor = function() {
       }
     }).always(function() {
       _unblockUI();
-    }).fail(function(xhr, status, error) {
-      $('#error-message').text(xhr.responseJSON['message']);
-      $('#alert-error').show('slow');
-    });
+    }).fail(_handleAjaxError);
   }
 
   function save() {
@@ -87,31 +84,7 @@ var Processor = function() {
       _growl('Changes has been saved.');
     }).always(function() {
       _unblockUI();
-    }).fail(function(xhr, status, error) {
-      var message = null;
-      if (xhr.responseJSON) {
-        // Select error row.
-        var rowid = xhr.responseJSON['rowid'];
-        var errorRow = -1;
-        if (rowid) {
-          $.each(_ht.getData(), function(i, data) {
-            if (data[0] == rowid) {
-              _ht.selectCell(i, 0, i, 0, true);
-              errorRow = i;
-              return false;
-            }
-          });
-        }
-        // Show error.
-        message = xhr.responseJSON['message'];
-        if (errorRow > -1) {
-          message = '[Row = ' + (errorRow + 1) + '] ' + message;
-        }
-      } else {
-        message = xhr.responseText;
-      }
-      _growl(message, 'danger');
-    });
+    }).fail(_handleAjaxError);
   }
 
   // PRIVATE --------------------------------------------------
@@ -318,6 +291,32 @@ var Processor = function() {
   function _handleAddFirstRowClick() {
     _ht && _ht.alter('insert_row');
     $('#add-first-row').hide();
+  }
+
+  function _handleAjaxError(xhr, status, error) {
+    var message = null;
+    if (xhr.responseJSON) {
+      // Select error row.
+      var rowid = xhr.responseJSON['rowid'];
+      var errorRow = -1;
+      if (rowid) {
+        $.each(_ht.getData(), function(i, data) {
+          if (data[0] == rowid) {
+            _ht.selectCell(i, 0, i, 0, true);
+            errorRow = i;
+            return false;
+          }
+        });
+      }
+      // Show error.
+      message = xhr.responseJSON['message'];
+      if (errorRow > -1) {
+        message = '[Row = ' + (errorRow + 1) + '] ' + message;
+      }
+    } else {
+      message = xhr.responseText;
+    }
+    _growl(message, 'danger');
   }
 
   function _blockUI() {

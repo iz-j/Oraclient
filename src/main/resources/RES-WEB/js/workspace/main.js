@@ -13,6 +13,7 @@ var Workspace = function() {
   function init() {
     _connectionId = $('#connection-id').val();
 
+    NamingDialog.init();
     SqlList.init();
     SqlEditor.init();
     ProcessorAdaptor.init(_connectionId);
@@ -23,7 +24,9 @@ var Workspace = function() {
 
     $(window).on('resize orientationchange', _handleResize).resize();
     _setupSearch();
+
     $('#btn-free-sql').on('click', _handleFreeSqlClick);
+    $('#btn-clear-cache').on('click', _handleClearCacheClick);
   }
 
 
@@ -92,7 +95,7 @@ var Workspace = function() {
       SqlList.addContent(res);
     });
   }
-  
+
   function _handleSqlListChange(sql) {
     SqlEditor.setSql(sql);
     ProcessorAdaptor.setSql(sql, _connectionId);
@@ -106,9 +109,18 @@ var Workspace = function() {
   function _handleSqlEditorExecute(sql) {
     ProcessorAdaptor.executeSql(sql);
   }
-  
+
   function _handleFreeSqlClick() {
     _getSqlItemView();
+  }
+
+  function _handleClearCacheClick() {
+    $.ajax({
+      url: '/workspace/clearCache',
+      type: 'post'
+    }).done(function(res) {
+      Base.growl('Cache was cleared.');
+    });
   }
 
   return {

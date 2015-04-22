@@ -13,10 +13,13 @@ var SqlEditor = function() {
   // PUBLIC --------------------------------------------------
 
   function init() {
-    $('#sql-editor').prop('disabled', true).on('input propertychange', _handleTextChange);
     _disableButtons(true);
+
+    $('#sql-editor').prop('disabled', true).on('input propertychange', _handleTextChange);
     $('#btn-format').on('click', _handleFormatClick);
     $('#btn-execute').on('click', _handleExecuteClick);
+
+    _textcomplete();
   }
 
   function setSql(sql) {
@@ -81,6 +84,21 @@ var SqlEditor = function() {
 
   function _handleExecuteClick(e) {
     (_sql && _onExecute) && _onExecute(_sql);
+  }
+
+  function _textcomplete() {
+    // Setup.
+    $('#sql-editor').textcomplete([{
+      match: /(^|\s)([A-Za-z]\w*)$/,
+      search: function (term, callback) {
+        callback(['aaa', 'abb', 'acc', 'add', 'aee', 'bbb', 'bcc', 'bdd']);
+      },
+      replace: function (value) {
+        return value + ' ';
+      }
+    }], {
+      appendTo: $('#for-textcomplete')// To resolve css conflict!
+    });
   }
 
   return {

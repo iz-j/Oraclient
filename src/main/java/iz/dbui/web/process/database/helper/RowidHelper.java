@@ -19,6 +19,7 @@ public final class RowidHelper {
 	}
 
 	private static final String PK_DELIMITER = "$$$";
+	private static final String NONE_ROWID = "none";
 
 	/**
 	 * @param records
@@ -33,7 +34,7 @@ public final class RowidHelper {
 				return rec.get(pkIndex);
 			}).collect(Collectors.joining(PK_DELIMITER));
 
-			rec.add(0, rowid);
+			rec.add(0, StringUtils.isNotEmpty(rowid) ? rowid : NONE_ROWID);
 		});
 	}
 

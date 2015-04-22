@@ -2,7 +2,7 @@ package iz.dbui;
 
 import iz.dbui.web.spring.AppConfig;
 import iz.dbui.web.spring.WebMvcConfig;
-import iz.dbui.web.spring.jdbc.ConnectionDeterminer;
+import iz.dbui.web.spring.jdbc.ConnectionContext;
 import iz.dbui.web.spring.jdbc.DataSourceRouter;
 import iz.dbui.web.spring.jdbc.DatabaseException;
 
@@ -42,7 +42,7 @@ abstract public class AbstractSpringTest {
 		// Use oracle to test.
 		final DataSourceRouter ds = (DataSourceRouter)dataSource;
 		ds.addNewConnection("test", "172.27.12.60", 1521, "ac2", "account", "account");
-		ConnectionDeterminer.setId("test");
+		ConnectionContext.setId("test");
 
 		logger.info("------------------------------ Start test! ------------------------------");
 	}

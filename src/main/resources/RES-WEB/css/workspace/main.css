@@ -64,6 +64,12 @@
 #sql-editor {
   height: calc(100% - 5px);
   font-size: 13px;
+  resize: none;
+}
+
+#for-textcomplete > .dropdown-menu {
+  -webkit-transform: initial;
+  transform: initial;
 }
 
 /* Processor --------------------------------------------------*/

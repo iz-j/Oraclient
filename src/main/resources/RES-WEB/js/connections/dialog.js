@@ -12,7 +12,7 @@ var ConnectionDialog = function() {
     _setupValidation();
     $('#connection-dialog').on('shown.bs.modal', function (e) {
       $('#name').focus();
-    })
+    });
     $('#btn-submit').on('click', _handleOkClick);
   }
 

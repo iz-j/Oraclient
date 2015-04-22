@@ -59,17 +59,21 @@ var SqlList = function() {
     }
 
     // Fire event.
-    _onChange(a ? {
+    _onChange(_createModel(a));
+  }
+
+  function _find(id) {
+    return $('#sql-' + id);
+  }
+
+  function _createModel(a) {
+    return a ? {
       id: a.data('id'),
       type: a.data('type'),
       tableName: a.data('table-name'),
       name: a.find('.sql-name').text(),
       sentence: a.find('.sql-sentence').text()
-      } : null);
-  }
-
-  function _find(id) {
-    return $('#sql-' + id);
+      } : null;
   }
 
   function _handleClick(e) {
@@ -92,7 +96,13 @@ var SqlList = function() {
 
     // Fire each events when functional buttons are clicked.
     if (el.hasClass('sql-item-save')) {
-
+      NamingDialog.show(function(name) {
+        var sql = _createModel($(a));
+        sql.name = name;
+        a.find('.sql-name').text(name);
+        a = null;// Remove reference to dom in closure!
+        _saveTemplate(sql);
+      });
     } else if (el.hasClass('sql-item-remove')) {
       $(a).parent().remove();
       _select(null);
@@ -100,6 +110,17 @@ var SqlList = function() {
       // Otherwise, fire change event.
       _select($(a).data('id'));
     }
+  }
+
+  function _saveTemplate(sql) {
+    $.ajax({
+      url: '/workspace/saveTemplate',
+      type: 'post',
+      contentType: 'application/json',
+      data: JSON.stringify(sql)
+    }).done(function(res) {
+      Base.growl('SQL saved as ' + sql.name);
+    });
   }
 
   return {

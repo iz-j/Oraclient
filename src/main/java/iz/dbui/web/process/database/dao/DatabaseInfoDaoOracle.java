@@ -1,5 +1,6 @@
 package iz.dbui.web.process.database.dao;
 
+import iz.dbui.web.process.ProcessConstants;
 import iz.dbui.web.process.database.dto.ColumnInfo;
 import iz.dbui.web.process.database.dto.ColumnInfo.DataType;
 
@@ -59,7 +60,7 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 	private JdbcTemplate jdbc;
 
 	@Override
-	@Cacheable(value = "database", key = "#connectionId")
+	@Cacheable(value = ProcessConstants.CACHE_DATABASE, key = "#connectionId")
 	public List<String> findAllTableNames(String connectionId) {
 		logger.trace("#findAllTableNames");
 		return jdbc.query(SEL_ALL_TABLES, new RowMapper<String>() {
@@ -133,7 +134,7 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 
 			@Override
 			public Pair<List<ColumnInfo>, List<List<String>>> extractData(ResultSet rs) throws SQLException,
-					DataAccessException {
+			DataAccessException {
 				final List<ColumnInfo> columns = new ArrayList<>();
 				final List<List<String>> records = new ArrayList<>();
 

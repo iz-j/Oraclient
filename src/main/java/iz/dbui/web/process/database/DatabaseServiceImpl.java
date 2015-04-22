@@ -1,17 +1,19 @@
 package iz.dbui.web.process.database;
 
+import iz.dbui.base.AppDataManager;
 import iz.dbui.web.process.database.dao.DatabaseInfoDao;
 import iz.dbui.web.process.database.dto.ColumnInfo;
 import iz.dbui.web.process.database.dto.ExecutionResult;
 import iz.dbui.web.process.database.dto.LocalChanges;
 import iz.dbui.web.process.database.dto.SqlTemplate;
 import iz.dbui.web.process.database.dto.SqlTemplate.TemplateType;
+import iz.dbui.web.process.database.dto.SqlTemplates;
 import iz.dbui.web.process.database.helper.ColumnInfoHelper;
 import iz.dbui.web.process.database.helper.MergeSqlBuilder;
 import iz.dbui.web.process.database.helper.RowidHelper;
 import iz.dbui.web.process.database.helper.SqlAnalyzer;
 import iz.dbui.web.process.database.helper.SqlAnalyzer.AnalysisResult;
-import iz.dbui.web.spring.jdbc.ConnectionDeterminer;
+import iz.dbui.web.spring.jdbc.ConnectionContext;
 import iz.dbui.web.spring.jdbc.DatabaseException;
 
 import java.util.ArrayList;
@@ -19,9 +21,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.Pair;
@@ -48,21 +50,29 @@ public class DatabaseServiceImpl implements DatabaseService {
 
 		List<SqlTemplate> templates = new ArrayList<>();
 
+		final Predicate<SqlTemplate> filter = (t -> {
+			return StringUtils.containsIgnoreCase(t.name, term);
+		});
+
 		// Retrieve table names.
-		final List<String> tableNames = dbDao.findAllTableNames(ConnectionDeterminer.getCurrentId());
+		final List<String> tableNames = dbDao.findAllTableNames(ConnectionContext.getCurrentId());
 		logger.trace("{} tables found.", tableNames.size());
 		templates.addAll(tableNames.stream().map(tableName -> {
 			return SqlTemplate.forTableSql(tableName);
-		}).collect(Collectors.toList()));
+		}).filter(filter).limit(50).collect(Collectors.toList()));
 
 		// Retrieve custom registered.
+		final SqlTemplates registered = AppDataManager.load(SqlTemplates.class);
+		templates.addAll(registered
+				.getTemplates()
+				.values()
+				.stream()
+				.filter(filter)
+				.limit(50)
+				.collect(Collectors.toList()));
 
-		// Filter and sort.
-		templates = templates.stream().filter(t -> {
-			return StringUtils.containsIgnoreCase(t.name, term);
-		}).sorted((t1, t2) -> {
-			return ObjectUtils.compare(t1.name, t2.name);
-		}).limit(20).collect(Collectors.toList());
+		// Sort.
+		templates = templates.stream().sorted(SqlTemplate.COMPARATOR).collect(Collectors.toList());
 
 		logger.trace("{} templates found.", templates.size());
 		return templates;
@@ -84,8 +94,9 @@ public class DatabaseServiceImpl implements DatabaseService {
 				result.records = queryResult.getRight();
 
 				// Determine editable or not.
-				final List<String> pks = dbDao.findPrimaryKeysBy(ConnectionDeterminer.getCurrentId(), sql.tableName);
+				List<String> pks = null;
 				if (sql.type == TemplateType.TABLE) {
+					pks = dbDao.findPrimaryKeysBy(ConnectionContext.getCurrentId(), sql.tableName);
 					result.tableName = sql.tableName;
 					result.editable = ColumnInfoHelper.containsAll(result.columns, pks);
 					logger.trace("editable = {}", result.editable);
@@ -120,7 +131,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 			final String tableName = changes.tableName;
 			final List<ColumnInfo> columns = changes.columns;
 
-			final List<String> pks = dbDao.findPrimaryKeysBy(ConnectionDeterminer.getCurrentId(), changes.tableName);
+			final List<String> pks = dbDao.findPrimaryKeysBy(ConnectionContext.getCurrentId(), changes.tableName);
 
 			// Handle insert and update.
 			changes.editedMap.forEach((rowid, values) -> {
@@ -135,8 +146,8 @@ public class DatabaseServiceImpl implements DatabaseService {
 				dbDao.executeUpdate(sql);
 
 				// Set new rowid for client.
-					retval.put(rowid, RowidHelper.createRowid(values, columns, pks, rowid));
-				});
+				retval.put(rowid, RowidHelper.createRowid(values, columns, pks, rowid));
+			});
 
 			// Handle delete.
 			changes.removedRowids.forEach(rowid -> {
@@ -153,5 +164,22 @@ public class DatabaseServiceImpl implements DatabaseService {
 			ex.setRowid(rowidHolder.getValue());
 			throw ex;
 		}
+	}
+
+	@Override
+	public void save(SqlTemplate sql) {
+		final SqlTemplates all = AppDataManager.load(SqlTemplates.class);
+		if (all.getTemplates().containsKey(sql.id)) {
+			logger.debug("Overwrite SqlTemplate. id = {}", sql.id);
+		}
+		all.getTemplates().put(sql.id, sql);
+		AppDataManager.save(all);
+		logger.trace("SqlTemplate saved. total = {}", all.getTemplates().size());
+	}
+
+	@Override
+	public List<String> getSqlCompletions(String term) {
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
 	}
 }

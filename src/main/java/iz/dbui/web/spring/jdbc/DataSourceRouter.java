@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.AbstractDataSource;
 
 /**
- * This class returns {@link javax.sql.DataSource} by {@link ConnectionDeterminer#getCurrentId()} of current thread.
+ * This class returns {@link javax.sql.DataSource} by {@link ConnectionContext#getCurrentId()} of current thread.
  *
  * @author izumi_j
  *
@@ -74,11 +74,11 @@ public final class DataSourceRouter extends AbstractDataSource {
 
 	@Override
 	public Connection getConnection() throws SQLException {
-		final DataSource ds = targetDataSources.get(ConnectionDeterminer.getCurrentId());
+		final DataSource ds = targetDataSources.get(ConnectionContext.getCurrentId());
 		if (ds != null) {
 			return ds.getConnection();
 		} else {
-			throw new IllegalStateException("DataSource was not found! id = " + ConnectionDeterminer.getCurrentId());
+			throw new IllegalStateException("DataSource was not found! id = " + ConnectionContext.getCurrentId());
 		}
 	}
 

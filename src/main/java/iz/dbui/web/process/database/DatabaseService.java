@@ -23,4 +23,8 @@ public interface DatabaseService {
 
 	@Transactional(rollbackFor = { DatabaseException.class })
 	Map<String, String> save(LocalChanges changes) throws DatabaseException;
+
+	void save(SqlTemplate sql);
+
+	List<String> getSqlCompletions(String term);
 }

@@ -3,7 +3,7 @@ package iz.dbui.web.process.database.dao;
 import static org.junit.Assert.*;
 import iz.dbui.AbstractSpringTest;
 import iz.dbui.web.process.database.dao.DatabaseInfoDao;
-import iz.dbui.web.spring.jdbc.ConnectionDeterminer;
+import iz.dbui.web.spring.jdbc.ConnectionContext;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.Test;
@@ -23,7 +23,7 @@ public class DatabaseInfoDaoTest extends AbstractSpringTest {
 
 		sw.start();
 		final String tableName1st = dao
-				.findAllTableNames(ConnectionDeterminer.getCurrentId())
+				.findAllTableNames(ConnectionContext.getCurrentId())
 				.stream()
 				.findFirst()
 				.get();
@@ -33,7 +33,7 @@ public class DatabaseInfoDaoTest extends AbstractSpringTest {
 		sw.reset();
 		sw.start();
 		final String tableName2nd = dao
-				.findAllTableNames(ConnectionDeterminer.getCurrentId())
+				.findAllTableNames(ConnectionContext.getCurrentId())
 				.stream()
 				.findFirst()
 				.get();

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public final class ConnectionDeterminer {
+public final class ConnectionContext {
 	private static ThreadLocal<String> idHolder = new InheritableThreadLocal<String>() {
 		@Override
 		protected String initialValue() {
@@ -42,6 +42,6 @@ public final class ConnectionDeterminer {
 		return idHolder.get();
 	}
 
-	private ConnectionDeterminer() {
+	private ConnectionContext() {
 	}
 }

@@ -4,7 +4,7 @@ import iz.dbui.web.process.database.DatabaseService;
 import iz.dbui.web.process.database.dto.ExecutionResult;
 import iz.dbui.web.process.database.dto.LocalChanges;
 import iz.dbui.web.process.database.dto.SqlTemplate;
-import iz.dbui.web.spring.jdbc.ConnectionDeterminer;
+import iz.dbui.web.spring.jdbc.ConnectionContext;
 import iz.dbui.web.spring.jdbc.DatabaseException;
 
 import java.util.Map;
@@ -40,7 +40,7 @@ public class ProcessorController {
 	public @ResponseBody ExecutionResult execute(@PathVariable("connectionId") String connectionId,
 			@RequestBody SqlTemplate sql) throws DatabaseException {
 		logger.trace("#execute {}", sql);
-		ConnectionDeterminer.setId(connectionId);
+		ConnectionContext.setId(connectionId);
 		return dbService.executeSql(sql);
 	}
 
@@ -48,7 +48,7 @@ public class ProcessorController {
 	public @ResponseBody Map<String, String> save(@PathVariable("connectionId") String connectionId,
 			@RequestBody LocalChanges changes) throws DatabaseException {
 		logger.trace("#save {}", changes);
-		ConnectionDeterminer.setId(connectionId);
+		ConnectionContext.setId(connectionId);
 		return dbService.save(changes);
 	}
 

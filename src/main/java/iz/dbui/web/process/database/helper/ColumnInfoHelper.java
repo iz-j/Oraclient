@@ -2,9 +2,11 @@ package iz.dbui.web.process.database.helper;
 
 import iz.dbui.web.process.database.dto.ColumnInfo;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -45,6 +47,10 @@ public final class ColumnInfoHelper {
 	 * @return index list of primary keys
 	 */
 	public static List<Integer> primaryKeyIndexes(List<ColumnInfo> columns, List<String> pks) {
+		if (CollectionUtils.isEmpty(pks)) {
+			return Collections.emptyList();
+		}
+
 		return columns.stream().filter(column -> {
 			return pks.stream().anyMatch(pk -> {
 				return StringUtils.equalsIgnoreCase(column.columnName, pk);

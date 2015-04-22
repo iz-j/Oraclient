@@ -1,12 +1,13 @@
 package iz.dbui.web.process.database.helper;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("deprecation")
 public class RowidInjectorTest {
 	private static final Logger logger = LoggerFactory.getLogger(RowidInjectorTest.class);
 

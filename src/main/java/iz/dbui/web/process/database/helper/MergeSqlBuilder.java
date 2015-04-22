@@ -1,11 +1,13 @@
 package iz.dbui.web.process.database.helper;
 
 import iz.dbui.web.process.database.dto.ColumnInfo;
+import iz.dbui.web.process.database.dto.ColumnInfo.DataType;
 
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 
 /**
  * TODO Resolve oracle dependencies!
@@ -44,7 +46,7 @@ public final class MergeSqlBuilder {
 				sql.append(", ");
 			}
 			final int index = columns.indexOf(column);
-			sql.append(toSqlVal(source.get(index)));
+			sql.append(toSqlVal(source.get(index), column.dataType));
 		});
 
 		sql.append(")");
@@ -73,7 +75,7 @@ public final class MergeSqlBuilder {
 				sql.append(", ");
 			}
 			final ColumnInfo column = columns.get(columnIndex);
-			sql.append(column.columnName).append(" = ").append(toSqlVal(value));
+			sql.append(column.columnName).append(" = ").append(toSqlVal(value, column.dataType));
 		});
 
 		sql.append(" WHERE ");
@@ -86,11 +88,11 @@ public final class MergeSqlBuilder {
 			}
 
 			// keys and pkIndexes are same order!
-				final int columnIndex = pkIndexes.get(keys.indexOf(key));
+			final int columnIndex = pkIndexes.get(keys.indexOf(key));
 
-				final ColumnInfo column = columns.get(columnIndex);
-				sql.append(column.columnName).append(" = ").append(toSqlVal(key));
-		});
+			final ColumnInfo column = columns.get(columnIndex);
+			sql.append(column.columnName).append(" = ").append(toSqlVal(key, column.dataType));
+			});
 
 		return sql.toString();
 	}
@@ -115,16 +117,30 @@ public final class MergeSqlBuilder {
 			final int columnIndex = pkIndexes.get(keys.indexOf(key));
 
 			final ColumnInfo column = columns.get(columnIndex);
-			sql.append(column.columnName).append(" = ").append(toSqlVal(key));
+			sql.append(column.columnName).append(" = ").append(toSqlVal(key, column.dataType));
 		});
 
 		return sql.toString();
 	}
 
-	private static String toSqlVal(String value) {
+	private static String toSqlVal(String value, DataType dataType) {
 		if (StringUtils.isEmpty(value)) {
 			return "null";
-		} else {
+		}
+
+		switch (dataType) {
+		case NUMBER:
+			return StringUtils.trim(value);
+		case DATE:
+			final DateTime parsed = DateTimeValueParser.parse(value);
+			if (parsed != null) {
+				return "TO_DATE('" + parsed.toString("yyyy-MM-dd HH:mm:ss") + "', 'YYYY-MM-DD HH24:MI:SS')";
+			} else {
+				return "'" + value + "'";
+			}
+		case STRING:
+		case OTHER:
+		default:
 			return "'" + value + "'";
 		}
 	}
