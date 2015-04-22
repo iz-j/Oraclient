@@ -15,7 +15,7 @@ var Workspace = function() {
 
     NamingDialog.init();
     SqlList.init();
-    SqlEditor.init();
+    SqlEditor.init(_connectionId);
     ProcessorAdaptor.init(_connectionId);
 
     SqlList.setOnChange(_handleSqlListChange);

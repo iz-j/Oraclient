@@ -4,6 +4,8 @@
 
 var SqlEditor = function() {
 
+  var _connectionId = null;
+  
   var _onChange = null;
   var _onExecute = null;
   var _sql = null;
@@ -12,7 +14,8 @@ var SqlEditor = function() {
 
   // PUBLIC --------------------------------------------------
 
-  function init() {
+  function init(connectionId) {
+    _connectionId = connectionId;
     _disableButtons(true);
 
     $('#sql-editor').prop('disabled', true).on('input propertychange', _handleTextChange);
@@ -89,12 +92,20 @@ var SqlEditor = function() {
   function _textcomplete() {
     // Setup.
     $('#sql-editor').textcomplete([{
-      match: /(^|\s)([A-Za-z]\w*)$/,
+      match: /(^|\x20)([A-Za-z]\w*)$/,
       search: function (term, callback) {
-        callback(['aaa', 'abb', 'acc', 'add', 'aee', 'bbb', 'bcc', 'bdd']);
+        $.getJSON('/workspace/sqlCompletions', {
+          connectionId: _connectionId,
+          term: term,
+          tableName: _sql.tableName
+        }).done(function (res) {
+          callback(res);
+        }).fail(function () {
+          callback([]);
+        });
       },
       replace: function (value) {
-        return value + ' ';
+        return ' ' + value + ' ';
       }
     }], {
       appendTo: $('#for-textcomplete')// To resolve css conflict!

@@ -13,6 +13,7 @@ import iz.dbui.web.process.database.helper.MergeSqlBuilder;
 import iz.dbui.web.process.database.helper.RowidHelper;
 import iz.dbui.web.process.database.helper.SqlAnalyzer;
 import iz.dbui.web.process.database.helper.SqlAnalyzer.AnalysisResult;
+import iz.dbui.web.process.database.other.SqlCompletionWords;
 import iz.dbui.web.spring.jdbc.ConnectionContext;
 import iz.dbui.web.spring.jdbc.DatabaseException;
 
@@ -146,8 +147,8 @@ public class DatabaseServiceImpl implements DatabaseService {
 				dbDao.executeUpdate(sql);
 
 				// Set new rowid for client.
-				retval.put(rowid, RowidHelper.createRowid(values, columns, pks, rowid));
-			});
+					retval.put(rowid, RowidHelper.createRowid(values, columns, pks, rowid));
+				});
 
 			// Handle delete.
 			changes.removedRowids.forEach(rowid -> {
@@ -178,8 +179,20 @@ public class DatabaseServiceImpl implements DatabaseService {
 	}
 
 	@Override
-	public List<String> getSqlCompletions(String term) {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+	public List<String> getSqlCompletions(String term, String tableName) {
+		final List<String> all = new ArrayList<>();
+		// Reserved words.
+		all.addAll(SqlCompletionWords.ALL);
+
+		// Get column names.
+		if (StringUtils.isNotEmpty(tableName)) {
+			final List<ColumnInfo> columns = dbDao.findColumnsBy(ConnectionContext.getCurrentId(), tableName);
+			all.addAll(ColumnInfoHelper.toColumnNames(columns));
+		}
+
+		// Filter.
+		return all.stream().filter(s -> {
+			return StringUtils.startsWithIgnoreCase(s, term);
+		}).sorted().collect(Collectors.toList());
 	}
 }

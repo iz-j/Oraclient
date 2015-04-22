@@ -98,8 +98,11 @@ public class WorkspaceController {
 	}
 
 	@RequestMapping(value = "/sqlCompletions", method = RequestMethod.GET)
-	public @ResponseBody List<String> sqlCompletions(@RequestParam("term") String term) {
+	public @ResponseBody List<String> sqlCompletions(@RequestParam("connectionId") String connectionId,
+			@RequestParam("term") String term,
+			@RequestParam(value = "tableName", required = false) String tableName) {
 		logger.trace("#sqlCompletions");
-		return dbService.getSqlCompletions(term);
+		ConnectionContext.setId(connectionId);
+		return dbService.getSqlCompletions(term, tableName);
 	}
 }

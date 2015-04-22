@@ -28,7 +28,7 @@ public final class AppDataManager {
 	static {
 		final String appDataDir = System.getenv("AppData");
 		if (StringUtils.isNotEmpty(appDataDir)) {
-			dirPath = appDataDir;
+			dirPath = appDataDir + "/db-ui";
 		} else {
 			dirPath = System.getProperty("user.home") + "/db-ui";
 		}
@@ -67,7 +67,7 @@ public final class AppDataManager {
 			JAXBContext context = JAXBContext.newInstance(dataClass);
 			Unmarshaller unmarshaller = context.createUnmarshaller();
 			File file = getFile(dataClass);
-			return file != null ? (D)unmarshaller.unmarshal(createFile(dataClass)) : dataClass.newInstance();
+			return file != null ? (D) unmarshaller.unmarshal(createFile(dataClass)) : dataClass.newInstance();
 		} catch (JAXBException | IOException | InstantiationException | IllegalAccessException e) {
 			logger.error("Failed to load.", e);
 			throw new IllegalStateException(e);

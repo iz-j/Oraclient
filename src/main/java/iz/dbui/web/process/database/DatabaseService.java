@@ -26,5 +26,5 @@ public interface DatabaseService {
 
 	void save(SqlTemplate sql);
 
-	List<String> getSqlCompletions(String term);
+	List<String> getSqlCompletions(String term, String tableName);
 }
