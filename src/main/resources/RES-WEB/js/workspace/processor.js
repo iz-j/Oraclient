@@ -143,6 +143,7 @@ var Processor = function() {
       width: size['w'],
       height: size['h'],
       contextMenu: _htContextMenu(),
+      autoWrapRow: true,
       undo: false,
       readOnly: !_editable,
       readOnlyCellClassName: null,
@@ -281,13 +282,13 @@ var Processor = function() {
 
   function _htBeforeKeyDown(e) {
     if (!e.ctrlKey) {
-      return true;
+      return;
     }
 
-    switch (key) {
+    switch (e.keyCode) {
     case 45://Ins
       var selected = _ht.getSelected();// [startRow, startCol, endRow, endCol]
-      _ht.alter ('insert_col', selected[0]);
+      _ht.alter ('insert_row', selected[0]);
       e.stopImmediatePropagation();
       break;
     case 46://Del
