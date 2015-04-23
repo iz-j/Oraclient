@@ -5,6 +5,7 @@ html {
 body {
   height: 100%;
   margin: 0;
+  font-family: "ヒラギノ角ゴ Pro W3",メイリオ,Osaka,Arial,Verdana,"ＭＳ Ｐゴシック",sans-serif;
   font-size: 13px;
 }
 
@@ -39,7 +40,7 @@ body {
   position: absolute;
   bottom: 0px;
   height: 18px;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .alert {

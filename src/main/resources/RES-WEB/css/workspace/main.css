@@ -73,6 +73,10 @@
   font-size: 12px;
 }
 
+#for-textcomplete > .dropdown-menu > li > a > i {
+  opacity: 1;
+}
+
 /* Processor --------------------------------------------------*/
 #processor-adaptor {
   height: 100%;

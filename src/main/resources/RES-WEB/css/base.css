@@ -1,3 +1,7 @@
+body {
+  font-family: "ヒラギノ角ゴ Pro W3",メイリオ,Osaka,Arial,Verdana,"ＭＳ Ｐゴシック",sans-serif;
+}
+
 #block-ui {
   padding: 10px;
 }

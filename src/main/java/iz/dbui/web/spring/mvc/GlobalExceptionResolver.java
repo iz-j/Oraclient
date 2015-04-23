@@ -19,17 +19,18 @@ public class GlobalExceptionResolver implements HandlerExceptionResolver {
 	public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler,
 			Exception ex) {
 		logger.error("Request failed!", ex);
-		final ModelAndView mv = new ModelAndView();
 		if (ex instanceof DatabaseException) {
+			final ModelAndView mv = new ModelAndView();
 			response.setStatus(HttpStatus.BAD_REQUEST.value());
 			mv.setView(new MappingJackson2JsonView());
-			final DatabaseException dbEx = (DatabaseException) ex;
+			final DatabaseException dbEx = (DatabaseException)ex;
 			mv.addObject("message", dbEx.getSqlExceptionMessage());
 			mv.addObject("rowid", dbEx.getRowid());
+			return mv;
 		} else {
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+			return null;
 		}
-		return mv;
 	}
 
 }

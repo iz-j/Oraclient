@@ -19,6 +19,7 @@ import iz.dbui.web.spring.jdbc.DatabaseException;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 	private static final Logger logger = LoggerFactory.getLogger(DatabaseServiceImpl.class);
 
 	private static final String NEW_REC_ROWID_PREFIX = "new$";
+	private static final String TABLE_ITEM_PREFIX = "*";
 
 	@Autowired
 	private DatabaseInfoDao dbDao;
@@ -147,8 +149,8 @@ public class DatabaseServiceImpl implements DatabaseService {
 				dbDao.executeUpdate(sql);
 
 				// Set new rowid for client.
-					retval.put(rowid, RowidHelper.createRowid(values, columns, pks, rowid));
-				});
+				retval.put(rowid, RowidHelper.createRowid(values, columns, pks, rowid));
+			});
 
 			// Handle delete.
 			changes.removedRowids.forEach(rowid -> {
@@ -180,19 +182,33 @@ public class DatabaseServiceImpl implements DatabaseService {
 
 	@Override
 	public List<String> getSqlCompletions(String term, String tableName) {
-		final List<String> all = new ArrayList<>();
-		// Reserved words.
-		all.addAll(SqlCompletionWords.ALL);
+		final Predicate<String> filter = s -> {
+			return StringUtils.startsWithIgnoreCase(s, term);
+		};
+
+		// Typical words.
+		final List<String> retval = SqlCompletionWords.TYPICALS.stream().filter(filter).collect(Collectors.toList());
 
 		// Get column names.
 		if (StringUtils.isNotEmpty(tableName)) {
 			final List<ColumnInfo> columns = dbDao.findColumnsBy(ConnectionContext.getCurrentId(), tableName);
-			all.addAll(ColumnInfoHelper.toColumnNames(columns));
+			retval.addAll(ColumnInfoHelper.toColumnNames(columns).stream().filter(filter).map(columnName -> {
+				return TABLE_ITEM_PREFIX + columnName;
+			}).collect(Collectors.toList()));
 		}
 
-		// Filter.
-		return all.stream().filter(s -> {
-			return StringUtils.startsWithIgnoreCase(s, term);
-		}).sorted().collect(Collectors.toList());
+		// Merge & Sort.
+		final Comparator<String> comparator = (s1, s2) -> {
+			if (StringUtils.startsWith(s1, TABLE_ITEM_PREFIX) && StringUtils.startsWith(s2, TABLE_ITEM_PREFIX)) {
+				return s1.compareTo(s2);
+			} else if (!StringUtils.startsWith(s1, TABLE_ITEM_PREFIX) && StringUtils.startsWith(s2, TABLE_ITEM_PREFIX)) {
+				return -1;
+			} else if (StringUtils.startsWith(s1, TABLE_ITEM_PREFIX) && !StringUtils.startsWith(s2, TABLE_ITEM_PREFIX)) {
+				return 1;
+			} else {
+				return s1.compareTo(s2);
+			}
+		};
+		return retval.stream().sorted(comparator).collect(Collectors.toList());
 	}
 }

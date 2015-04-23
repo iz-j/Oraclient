@@ -12,9 +12,9 @@ var NamingDialog = function() {
     $('#naming-ok').on('click', _handleOkClick);
   }
 
-  function show(onOk) {
+  function show(onOk, defVal) {
     _onOk = onOk;
-    $('#naming-value').val('');
+    $('#naming-value').val(defVal);
     $('#naming-dialog').modal('show');
   }
 

@@ -25,10 +25,18 @@ var Workspace = function() {
     $(window).on('resize orientationchange', _handleResize).resize();
     _setupSearch();
 
-    $('#btn-free-sql').on('click', _handleFreeSqlClick);
+    $('#btn-free-sql').on('click', fireNewFreeSql);
     $('#btn-clear-cache').on('click', _handleClearCacheClick);
+
+    setTimeout(function() {
+      $('#search-sql').select2('open');
+    }, 200);
   }
 
+
+  function fireNewFreeSql() {
+    _getSqlItemView();
+  }
 
   // PRIVATE --------------------------------------------------
 
@@ -76,9 +84,7 @@ var Workspace = function() {
       nextSearchTerm: function(obj, term) {
         return term;
       }
-    });
-
-    $('#search-sql').on('change', function(e) {
+    }).on('change', function(e) {
       $('#search-sql').select2('val', '');
       _getSqlItemView(e.added);
     });
@@ -110,10 +116,6 @@ var Workspace = function() {
     ProcessorAdaptor.executeSql(sql);
   }
 
-  function _handleFreeSqlClick() {
-    _getSqlItemView();
-  }
-
   function _handleClearCacheClick() {
     $.ajax({
       url: '/workspace/clearCache',
@@ -124,10 +126,28 @@ var Workspace = function() {
   }
 
   return {
-    'init': init
+    'init': init,
+    'fireNewFreeSql': fireNewFreeSql
   };
 }();
 
 $(function() {
   Workspace.init();
+
+  // Shortcut key.
+  $(document).on('keydown', function(e) {
+    switch (e.keyCode) {
+    case 120://F9
+      SqlEditor.fireExecute();
+      break;
+    case 70://F
+      (e.ctrlKey && e.shiftKey) && SqlEditor.fireFormat();
+      break;
+    case 81://Q
+      (e.ctrlKey) && Workspace.fireNewFreeSql();
+      break;
+    default:
+      break;
+    }
+  });
 });

@@ -52,6 +52,9 @@ var Processor = function() {
       _growl('This view is read only.');
       return;
     }
+
+    _ht && _ht.deselectCell ();
+
     if (Object.keys(_editedMap).length == 0 && _removedRowids.length == 0) {
       _growl('There are no changes.');
       return;
@@ -146,7 +149,8 @@ var Processor = function() {
       afterChange: _htAfterChange,
       afterRender: _htAfterRender,
       afterCreateRow: _htAfterCreateRow,
-      beforeRemoveRow: _htBeforeRemoveRow
+      beforeRemoveRow: _htBeforeRemoveRow,
+      beforeKeyDown: _htBeforeKeyDown
     });
   }
 
@@ -172,9 +176,14 @@ var Processor = function() {
 
       },
       items: {
-        'row_above': { disabled: isDisabled },
-        'row_below': { disabled: isDisabled },
-        'remove_row': { disabled: isDisabled },
+        'row_above': {
+          name: 'Insert row (Ctrl+Ins)',
+          disabled: isDisabled
+        },
+        'remove_row': {
+          name: 'Remove row (Ctrl+Del)',
+          disabled: isDisabled
+        },
         'hsep1': '---------'
       }
     };
@@ -268,6 +277,27 @@ var Processor = function() {
     }
     // Remove from edited.
     delete _editedMap[rowid];
+  }
+
+  function _htBeforeKeyDown(e) {
+    if (!e.ctrlKey) {
+      return true;
+    }
+
+    switch (key) {
+    case 45://Ins
+      var selected = _ht.getSelected();// [startRow, startCol, endRow, endCol]
+      _ht.alter ('insert_col', selected[0]);
+      e.stopImmediatePropagation();
+      break;
+    case 46://Del
+      var selected = _ht.getSelected();
+      _ht.alter ('remove_row', selected[0], selected[2] - selected[0] + 1);
+      e.stopImmediatePropagation();
+      break;
+    default:
+      break;
+    }
   }
 
   function _clearData() {

@@ -96,13 +96,13 @@ var SqlList = function() {
 
     // Fire each events when functional buttons are clicked.
     if (el.hasClass('sql-item-save')) {
+      var sql = _createModel($(a));
       NamingDialog.show(function(name) {
-        var sql = _createModel($(a));
         sql.name = name;
         a.find('.sql-name').text(name);
         a = null;// Remove reference to dom in closure!
         _saveTemplate(sql);
-      });
+      }, sql.name);
     } else if (el.hasClass('sql-item-remove')) {
       $(a).parent().remove();
       _select(null);

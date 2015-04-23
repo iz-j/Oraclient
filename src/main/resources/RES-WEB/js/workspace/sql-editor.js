@@ -5,7 +5,7 @@
 var SqlEditor = function() {
 
   var _connectionId = null;
-  
+
   var _onChange = null;
   var _onExecute = null;
   var _sql = null;
@@ -19,8 +19,8 @@ var SqlEditor = function() {
     _disableButtons(true);
 
     $('#sql-editor').prop('disabled', true).on('input propertychange', _handleTextChange);
-    $('#btn-format').on('click', _handleFormatClick);
-    $('#btn-execute').on('click', _handleExecuteClick);
+    $('#btn-format').on('click', fireFormat);
+    $('#btn-execute').on('click', fireExecute);
 
     _textcomplete();
   }
@@ -49,22 +49,11 @@ var SqlEditor = function() {
     _onExecute = fn;
   }
 
-  // PRIVATE --------------------------------------------------
-
-  function _disableButtons(disabled) {
-    $('#btn-format').prop('disabled', disabled);
-    $('#btn-execute').prop('disabled', disabled);
+  function fireExecute() {
+    (_sql && _onExecute) && _onExecute(_sql);
   }
 
-  function _handleTextChange(e) {
-    _timerId && clearTimeout(_timerId);
-    _timerId = setTimeout(function() {
-      _sql.sentence = $('#sql-editor').val();
-      _onChange && _onChange(_sql);
-    }, 300);
-  }
-
-  function _handleFormatClick(e) {
+  function fireFormat() {
     if (!_sql) {
       return;
     }
@@ -85,14 +74,25 @@ var SqlEditor = function() {
     });
   }
 
-  function _handleExecuteClick(e) {
-    (_sql && _onExecute) && _onExecute(_sql);
+  // PRIVATE --------------------------------------------------
+
+  function _disableButtons(disabled) {
+    $('#btn-format').prop('disabled', disabled);
+    $('#btn-execute').prop('disabled', disabled);
+  }
+
+  function _handleTextChange(e) {
+    _timerId && clearTimeout(_timerId);
+    _timerId = setTimeout(function() {
+      _sql.sentence = $('#sql-editor').val();
+      _onChange && _onChange(_sql);
+    }, 300);
   }
 
   function _textcomplete() {
     // Setup.
     $('#sql-editor').textcomplete([{
-      match: /(^|\x20)([A-Za-z]\w*)$/,
+      match: /(^|\s)([A-Za-z]\w*)$/,
       search: function (term, callback) {
         $.getJSON('/workspace/sqlCompletions', {
           connectionId: _connectionId,
@@ -105,10 +105,33 @@ var SqlEditor = function() {
         });
       },
       replace: function (value) {
-        return ' ' + value + ' ';
+        value = value.replace(/\*/, '');
+        // To avoid replacing white space or line break. Is this correct?
+        var whole = $('#sql-editor').val();
+        var check = whole.match(this.match);
+        if (!check) {
+          return value;
+        }
+        var str = check[1];
+        if (str == ' ') {
+          value = ' ' + value;
+        } else if (str == '\n') {
+          value = '\n' + value;
+        }
+        console.log(value);
+        return value + ' ';
+      },
+      template: function(value) {
+        if (value.lastIndexOf('*', 0) == 0) {
+          return value.replace(/\*/, '');
+        } else {
+          return '<b>' + value + '</b>';
+        }
       }
     }], {
       appendTo: $('#for-textcomplete')// To resolve css conflict!
+    }).on('textComplete:select', function(e, value) {
+      _handleTextChange(e);
     });
   }
 
@@ -117,6 +140,8 @@ var SqlEditor = function() {
     'setSql': setSql,
     'getSql': getSql,
     'setOnChange': setOnChange,
-    'setOnExecute': setOnExecute
+    'setOnExecute': setOnExecute,
+    'fireFormat': fireFormat,
+    'fireExecute': fireExecute
   };
 }();
