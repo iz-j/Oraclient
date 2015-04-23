@@ -1,7 +1,5 @@
 package iz.dbui.web.spring.jdbc;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,95 +16,6 @@ import org.springframework.transaction.support.DefaultTransactionStatus;
 @SuppressWarnings("serial")
 public final class TxManagerWrapper extends DataSourceTransactionManager {
 	private static final Logger logger = LoggerFactory.getLogger(TxManagerWrapper.class);
-
-	@PostConstruct
-	public void disableSpringLogger() {
-		// XXX Maybe, this is very hacky!
-		super.logger = new org.apache.commons.logging.Log() {
-
-			@Override
-			public boolean isTraceEnabled() {
-				return false;
-			}
-
-			@Override
-			public boolean isDebugEnabled() {
-				return false;
-			}
-
-			@Override
-			public boolean isInfoEnabled() {
-				return false;
-			}
-
-			@Override
-			public boolean isWarnEnabled() {
-				return false;
-			}
-
-			@Override
-			public boolean isErrorEnabled() {
-				return true;
-			}
-
-			@Override
-			public boolean isFatalEnabled() {
-				return true;
-			}
-
-			@Override
-			public void trace(Object message) {
-			}
-
-			@Override
-			public void trace(Object message, Throwable t) {
-			}
-
-			@Override
-			public void debug(Object message) {
-			}
-
-			@Override
-			public void debug(Object message, Throwable t) {
-			}
-
-			@Override
-			public void info(Object message) {
-			}
-
-			@Override
-			public void info(Object message, Throwable t) {
-			}
-
-			@Override
-			public void warn(Object message) {
-			}
-
-			@Override
-			public void warn(Object message, Throwable t) {
-			}
-
-			@Override
-			public void error(Object message) {
-				logger.error(message.toString());
-			}
-
-			@Override
-			public void error(Object message, Throwable t) {
-				logger.error(message.toString(), t);
-			}
-
-			@Override
-			public void fatal(Object message) {
-				logger.error(message.toString());
-			}
-
-			@Override
-			public void fatal(Object message, Throwable t) {
-				logger.error(message.toString(), t);
-			}
-		};
-	}
 
 	@Override
 	protected void doBegin(Object transaction, TransactionDefinition definition) {

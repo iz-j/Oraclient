@@ -53,7 +53,9 @@ public class MergeSqlBuilderTest {
 
 		final String sql = MergeSqlBuilder.insert(source, TABLE_NAME, COLUMNS);
 		logger.debug(sql);
-		assertEquals("INSERT INTO HOGE (ID, TXT, DT, NA) VALUES ('1', 'test', '1970/01/01', null)", sql);
+		assertEquals(
+				"INSERT INTO HOGE (ID, TXT, DT, NA) VALUES (1, 'test', TO_DATE('1970-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), null)",
+				sql);
 	}
 
 	@Test
@@ -65,6 +67,6 @@ public class MergeSqlBuilderTest {
 		final String sql = MergeSqlBuilder
 				.update(RowidHelper.rowidToPrimaryKeys("1"), source, TABLE_NAME, COLUMNS, PKS);
 		logger.debug(sql);
-		assertEquals("UPDATE HOGE SET ID = '1', TXT = 'test' WHERE ID = '1'", sql);
+		assertEquals("UPDATE HOGE SET ID = 1, TXT = 'test' WHERE ID = 1", sql);
 	}
 }
