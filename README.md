@@ -11,3 +11,10 @@ Database gui tool via JavaFX & Web
 
 * Launch `iz.dbui.DbUiMain`.
 * Or launch `iz.dbui.DbUiServerMain` and access to `localhost:8888`.
+
+
+### How to build?
+
+* `set JAVA_HOME={Java8}`
+* `gradle build`, then jar will be created in `/dist`.
+* If you want to wrap jar into exe, use ** /dist/launch4j/launch4j.exe ** .
