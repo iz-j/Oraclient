@@ -13,8 +13,9 @@ Database gui tool via JavaFX & Web
 * Or launch `iz.dbui.DbUiServerMain` and access to `localhost:8888`.
 
 
-### How to build?
+### How to package?
 
 * `set JAVA_HOME={Java8}`
-* `gradle build`, then jar will be created in `/dist`.
+* `gradle fatJar`, then jar will be created in `/dist`.
 * If you want to wrap jar into exe, use ** /dist/launch4j/launch4j.exe ** .
+

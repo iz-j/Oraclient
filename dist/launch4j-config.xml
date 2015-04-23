@@ -2,8 +2,8 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>.\hekeke-dakoku-1.0.jar</jar>
-  <outfile>HekekeDakoku.exe</outfile>
+  <jar>.\db-ui-0.1.jar</jar>
+  <outfile>DB-UI.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
