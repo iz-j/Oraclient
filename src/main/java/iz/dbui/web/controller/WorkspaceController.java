@@ -4,11 +4,13 @@ import iz.dbui.web.process.ProcessConstants;
 import iz.dbui.web.process.connection.ConnectionService;
 import iz.dbui.web.process.connection.dto.Connection;
 import iz.dbui.web.process.database.DatabaseService;
+import iz.dbui.web.process.database.dto.SqlComposite;
 import iz.dbui.web.process.database.dto.SqlTemplate;
 import iz.dbui.web.process.database.helper.SqlFormatter;
 import iz.dbui.web.spring.jdbc.ConnectionContext;
 import iz.dbui.web.spring.jdbc.DatabaseException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -63,7 +65,7 @@ public class WorkspaceController {
 			@RequestParam("term") String term) {
 		logger.trace("#findSqltemplates term = {}", term);
 		ConnectionContext.setId(connectionId);
-		return dbService.getMatchedTemplates(term);
+		return dbService.getMatchedSqlTemplates(term);
 	}
 
 	@RequestMapping(value = "/sqlItemView", method = RequestMethod.POST)
@@ -74,6 +76,14 @@ public class WorkspaceController {
 			sqlTemplate = SqlTemplate.forFreeSql();
 		}
 		mv.addObject("sqls", Arrays.asList(sqlTemplate));
+		return mv;
+	}
+
+	@RequestMapping(value = "/sqlItemViews", method = RequestMethod.POST)
+	public ModelAndView sqlItemViews(@RequestBody ArrayList<SqlTemplate> sqlTemplates) {
+		logger.trace("#sqlItemViews sqlTemplates = {}", sqlTemplates);
+		final ModelAndView mv = new ModelAndView("workspace/sql-item");
+		mv.addObject("sqls", sqlTemplates);
 		return mv;
 	}
 
@@ -104,5 +114,24 @@ public class WorkspaceController {
 		logger.trace("#sqlCompletions");
 		ConnectionContext.setId(connectionId);
 		return dbService.getSqlCompletions(term, tableName);
+	}
+
+	@RequestMapping(value = "/sqlComposites", method = RequestMethod.GET)
+	public @ResponseBody List<SqlComposite> getSqlComposites() {
+		logger.trace("#getSqlComposites");
+		return dbService.getAllSqlComposite();
+	}
+
+	@RequestMapping(value = "/saveComposite", method = RequestMethod.POST)
+	@ResponseStatus(HttpStatus.OK)
+	public void saveComposite(@RequestBody SqlComposite sqlComposite) {
+		logger.trace("#saveComposite");
+		dbService.save(sqlComposite);
+	}
+
+	@RequestMapping(value = "/sqlComposite", method = RequestMethod.GET)
+	public @ResponseBody SqlComposite getSqlComposite(@RequestParam("id") String id) {
+		logger.trace("#getSqlComposite id = {}", id);
+		return dbService.getSqlComposite(id);
 	}
 }

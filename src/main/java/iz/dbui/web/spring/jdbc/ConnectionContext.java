@@ -1,5 +1,12 @@
 package iz.dbui.web.spring.jdbc;
 
+import iz.dbui.web.process.connection.ConnectionService;
+import iz.dbui.web.process.connection.dto.Connection;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 /**
@@ -9,39 +16,60 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public final class ConnectionContext {
-	private static ThreadLocal<String> idHolder = new InheritableThreadLocal<String>() {
+public final class ConnectionContext implements ApplicationContextAware {
+	private static ThreadLocal<Connection> holder = new InheritableThreadLocal<Connection>() {
 		@Override
-		protected String initialValue() {
+		protected Connection initialValue() {
 			return null;
 		}
 	};
 
+	private static BeanFactory beanFactory;
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		if (BeanFactory.class.isAssignableFrom(applicationContext.getClass())) {
+			beanFactory = applicationContext;
+		} else {
+			throw new IllegalStateException("Why applicationContext is'nt BeanFactory???");
+		}
+	}
+
 	/**
-	 * Set identifier of the connection.
+	 * Set the connection.
 	 *
 	 * @param id
 	 */
 	public static void setId(String id) {
-		idHolder.set(id);
+		final ConnectionService connectionService = beanFactory.getBean(ConnectionService.class);
+		holder.set(connectionService.get(id));
 	}
 
 	/**
-	 * Reset id.
+	 * Reset.
 	 */
 	public static void reset() {
-		idHolder.remove();
+		holder.remove();
 	}
 
 	/**
-	 * Returns current id of this thread.
+	 * Returns id of connection for this thread.
 	 *
 	 * @return id
 	 */
 	public static String getCurrentId() {
-		return idHolder.get();
+		return holder.get().id;
+	}
+
+	/**
+	 * Returns user name.
+	 * @return name
+	 */
+	public static String getUserName() {
+		return holder.get().username;
 	}
 
 	private ConnectionContext() {
 	}
+
 }

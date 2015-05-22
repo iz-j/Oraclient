@@ -14,11 +14,13 @@ var Workspace = function() {
     _connectionId = $('#connection-id').val();
 
     NamingDialog.init();
+    CompositeDialog.init();
     SqlList.init();
     SqlEditor.init(_connectionId);
     ProcessorAdaptor.init(_connectionId);
 
     SqlList.setOnChange(_handleSqlListChange);
+    SqlList.setOnRemove(_handleSqlListRemove);
     SqlEditor.setOnChange(_handleSqlEditorChange);
     SqlEditor.setOnExecute(_handleSqlEditorExecute);
 
@@ -26,6 +28,8 @@ var Workspace = function() {
     _setupSearch();
 
     $('#btn-free-sql').on('click', fireNewFreeSql);
+    $('#btn-save-composite').on('click', _handleSaveCompositeClick);
+    $('#btn-load-composite').on('click', _handleLoadCompositeClick);
     $('#btn-clear-cache').on('click', _handleClearCacheClick);
 
     setTimeout(function() {
@@ -50,7 +54,7 @@ var Workspace = function() {
 
   function _setupSearch() {
     $('#search-sql').select2({
-      minimumInputLength: 3,
+      minimumInputLength: 1,
       ajax: {
         url: '/workspace/sqlTemplates',
         dataType: 'json',
@@ -104,7 +108,7 @@ var Workspace = function() {
 
   function _handleSqlListChange(sql) {
     SqlEditor.setSql(sql);
-    ProcessorAdaptor.setSql(sql, _connectionId);
+    ProcessorAdaptor.setSql(sql);
   }
 
   function _handleSqlEditorChange(sql) {
@@ -124,7 +128,62 @@ var Workspace = function() {
       Base.growl('Cache was cleared.');
     });
   }
+  
+  function _handleSaveCompositeClick() {
+    var templates = SqlList.getSqlList();
+    if (templates.length === 0) {
+      Base.growl('There are no SQL to save.', 'warning');
+      return;
+    }
+    
+    NamingDialog.show(function(name) {
+      var composite = {
+        id: $('#composite-info').data('id'),
+        name: name,
+        templates: templates
+      };
+      
+      $.ajax({
+        url: '/workspace/saveComposite',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify(composite)
+      }).done(function(res) {
+        Base.growl('SQL list saved as ' + name);
+        _setCompositeInfo(composite);
+      });
+    }, $('#composite-info').data('id') ? $('#composite-info').text() : '');
+  }
+  
+  function _handleLoadCompositeClick() {
+    CompositeDialog.show(function(composite) {
+      $.ajax({
+        url: '/workspace/sqlItemViews',
+        type: 'post',
+        dataType: 'html',
+        contentType: 'application/json',
+        data: JSON.stringify(composite.templates)
+      }).done(function(res) {
+        SqlList.clear();
+        SqlList.addContent(res);
+        _setCompositeInfo(composite);
+      });
+    });
+  }
 
+  function _handleSqlListRemove(sql) {
+    if (SqlList.isEmpty()) {
+      $('#composite-info').text('Do as you please')
+        .removeData('id').removeClass('label-info').addClass('label-default');
+    }
+    ProcessorAdaptor.removeSql(sql);
+  }
+  
+  function _setCompositeInfo(composite) {
+    $('#composite-info').text(composite.name)
+      .data('id', composite.id).removeClass('label-default').addClass('label-info');
+  }
+  
   return {
     'init': init,
     'fireNewFreeSql': fireNewFreeSql

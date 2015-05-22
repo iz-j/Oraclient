@@ -1,14 +1,14 @@
 /* Layout --------------------------------------------------*/
 #tool-area {
-  height: 45px;
+  height: 42px;
 }
 
 #list-area {
-  height: calc(30% - 45px);
+  height: calc(30% - 42px);
 }
 
 #workspace {
-  height: calc(70% - 45px);
+  height: calc(70% - 42px);
   margin-top: 10px;
 }
 
@@ -22,10 +22,10 @@
 }
 
 #sql-list {
-  height: 100%;
+  height: calc(100% - 24px);
   border: solid 1px silver;
   overflow-y: scroll;
-  padding-top: 10px;
+  padding-top: 5px;
 }
 
 #sql-list .widget {
@@ -67,14 +67,24 @@
   resize: none;
 }
 
-#for-textcomplete > .dropdown-menu {
+.sql-editor-suggest {
   -webkit-transform: initial;
   transform: initial;
   font-size: 12px;
+  max-height: 200px;
+  min-width: 200px:
 }
 
-#for-textcomplete > .dropdown-menu > li > a > i {
-  opacity: 1;
+.textassist .dropdown-menu i {
+  opacity: 0.75;
+}
+
+.textassist .dropdown-menu > li > a {
+  padding: 4px 40px 2px 4px;
+}
+
+.textassist .dropdown-menu > li > i {
+  margin: 4px 0px;
 }
 
 /* Processor --------------------------------------------------*/
@@ -90,4 +100,10 @@
   width: 100%;
   border: none;
   overflow: hidden;
+}
+
+/* Dialog ------------------------------------------------------*/
+#composite-list {
+  max-height: 240px;
+  overflow: auto;
 }

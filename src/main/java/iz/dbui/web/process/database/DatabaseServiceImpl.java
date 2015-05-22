@@ -5,6 +5,8 @@ import iz.dbui.web.process.database.dao.DatabaseInfoDao;
 import iz.dbui.web.process.database.dto.ColumnInfo;
 import iz.dbui.web.process.database.dto.ExecutionResult;
 import iz.dbui.web.process.database.dto.LocalChanges;
+import iz.dbui.web.process.database.dto.SqlComposite;
+import iz.dbui.web.process.database.dto.SqlComposites;
 import iz.dbui.web.process.database.dto.SqlTemplate;
 import iz.dbui.web.process.database.dto.SqlTemplate.TemplateType;
 import iz.dbui.web.process.database.dto.SqlTemplates;
@@ -23,9 +25,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.Pair;
@@ -46,7 +50,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 	private DatabaseInfoDao dbDao;
 
 	@Override
-	public List<SqlTemplate> getMatchedTemplates(String term) {
+	public List<SqlTemplate> getMatchedSqlTemplates(String term) {
 		if (StringUtils.isEmpty(term)) {
 			return Collections.emptyList();
 		}
@@ -211,4 +215,32 @@ public class DatabaseServiceImpl implements DatabaseService {
 		};
 		return retval.stream().sorted(comparator).collect(Collectors.toList());
 	}
+
+	@Override
+	public List<SqlComposite> getAllSqlComposite() {
+		return AppDataManager.load(SqlComposites.class).getComposites().values().stream().sorted((c1, c2) -> {
+			return ObjectUtils.compare(c1.name, c2.name);
+		}).collect(Collectors.toList());
+	}
+
+	@Override
+	public SqlComposite getSqlComposite(String id) {
+		return AppDataManager.load(SqlComposites.class).getComposites().get(id);
+	}
+
+	@Override
+	public void save(SqlComposite composite) {
+		if (StringUtils.isEmpty(composite.id)) {
+			composite.id = UUID.randomUUID().toString();
+		}
+
+		final SqlComposites all = AppDataManager.load(SqlComposites.class);
+		if (all.getComposites().containsKey(composite.id)) {
+			logger.debug("Overwrite SqlComposite. id = {}", composite.id);
+		}
+		all.getComposites().put(composite.id, composite);
+		AppDataManager.save(all);
+		logger.trace("SqlTemplate saved. total = {}", all.getComposites().size());
+	}
+
 }

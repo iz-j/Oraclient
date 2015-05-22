@@ -8,7 +8,7 @@ var NamingDialog = function() {
     _setupValidation();
     $('#naming-dialog').on('shown.bs.modal', function (e) {
       $('#naming-value').focus();
-    })
+    });
     $('#naming-ok').on('click', _handleOkClick);
   }
 

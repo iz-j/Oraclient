@@ -5,6 +5,8 @@
 var SqlList = function() {
 
   var _onChange = null;
+  var _onRemove = null;
+  
   var _selected = null;
 
   // PUBLIC --------------------------------------------------
@@ -31,10 +33,36 @@ var SqlList = function() {
     a.find('.sql-sentence').text(sql.sentence);
   }
 
+  function getSqlList() {
+    var list = [];
+    $('#sql-list .sql-item').each(function(index, a) {
+      list.push(_createModel($(a)));
+    });
+    return list;
+  }
+  
+  function clear() {
+    $('#sql-list').empty();
+    _select(null);
+    if (_onRemove) {
+      $('#sql-list .sql-item').each(function(index, a) {
+        _onRemove(_createModel($(a)));
+      });
+    }
+  }
+  
+  function isEmpty() {
+    return $('#sql-list .sql-item').length === 0;
+  }
+  
   function setOnChange(fn) {
     _onChange = fn;
   }
 
+  function setOnRemove(fn) {
+    _onRemove = fn;
+  }
+  
   // PRIVATE --------------------------------------------------
 
   function _select(id) {
@@ -82,16 +110,12 @@ var SqlList = function() {
     // Find anchor.
     var a = null;
     var wk = el;
-    if (wk.hasClass('sql-item-root')) {
-      a = wk.children().first();
-    } else {
-      while(wk) {
-        if (wk.hasClass('sql-item')) {
-          a = wk;
-          break;
-        }
-        wk = wk.parent();
+    while(wk.attr('id') !== 'sql-list') {
+      if (wk.hasClass('sql-item')) {
+        a = wk;
+        break;
       }
+      wk = wk.parent();
     }
 
     // Fire each events when functional buttons are clicked.
@@ -106,9 +130,10 @@ var SqlList = function() {
     } else if (el.hasClass('sql-item-remove')) {
       $(a).parent().remove();
       _select(null);
+      _onRemove && _onRemove(_createModel($(a)));
     } else {
       // Otherwise, fire change event.
-      _select($(a).data('id'));
+      a && _select($(a).data('id'));
     }
   }
 
@@ -127,6 +152,10 @@ var SqlList = function() {
     'init': init,
     'addContent': addContent,
     'updateSql': updateSql,
-    'setOnChange': setOnChange
+    'getSqlList': getSqlList,
+    'clear': clear,
+    'isEmpty': isEmpty,
+    'setOnChange': setOnChange,
+    'setOnRemove': setOnRemove,
   };
 }();

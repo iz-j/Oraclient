@@ -2,6 +2,7 @@ package iz.dbui.web.process.database;
 
 import iz.dbui.web.process.database.dto.ExecutionResult;
 import iz.dbui.web.process.database.dto.LocalChanges;
+import iz.dbui.web.process.database.dto.SqlComposite;
 import iz.dbui.web.process.database.dto.SqlTemplate;
 import iz.dbui.web.spring.jdbc.DatabaseException;
 
@@ -17,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public interface DatabaseService {
 
-	List<SqlTemplate> getMatchedTemplates(String term);
+	List<SqlTemplate> getMatchedSqlTemplates(String term);
 
 	ExecutionResult executeSql(SqlTemplate sql) throws DatabaseException;
 
@@ -27,4 +28,10 @@ public interface DatabaseService {
 	void save(SqlTemplate sql);
 
 	List<String> getSqlCompletions(String term, String tableName);
+
+	List<SqlComposite> getAllSqlComposite();
+
+	SqlComposite getSqlComposite(String id);
+
+	void save(SqlComposite composite);
 }

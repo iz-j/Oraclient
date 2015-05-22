@@ -17,13 +17,6 @@ var ProcessorAdaptor = function() {
   function setSql(sql) {
     var ifrm = null;
 
-    // Remove if sql is null.
-    if (!sql) {
-      ifrm = _findIframe(_sql.id);
-      ifrm && $(ifrm).remove();
-      return;
-    }
-
     // Hide current.
     if (_sql) {
       ifrm = _findIframe(_sql.id);
@@ -31,8 +24,13 @@ var ProcessorAdaptor = function() {
       ifrm = null;
     }
 
-    // Show new.
+    // Set
     _sql = sql;
+    if (!sql) {
+      return;
+    }
+    
+    // Show new.
     ifrm = _findIframe(sql.id);
     if (!ifrm) {
       $('#processor-root')
@@ -52,7 +50,8 @@ var ProcessorAdaptor = function() {
   }
 
   function removeSql(sql) {
-    _find(sql.id).remove();
+   var ifrm = _findIframe(sql.id);
+   ifrm && ifrm.remove();
   }
 
   function executeSql(sql) {

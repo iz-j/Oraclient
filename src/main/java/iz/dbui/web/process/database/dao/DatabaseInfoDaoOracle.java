@@ -33,13 +33,13 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 
 	private static final String SEL_ALL_TABLES;
 	static {
-		SEL_ALL_TABLES = "SELECT * FROM ALL_TABLES ORDER BY OWNER, TABLE_NAME";
+		SEL_ALL_TABLES = "SELECT * FROM USER_TABLES WHERE ORDER BY TABLE_NAME";
 	}
 
 	private static final String SEL_ALL_TAB_COLUMNS;
 	static {
 		SEL_ALL_TAB_COLUMNS = "SELECT A.*, B.COMMENTS FROM"
-				+ " ALL_TAB_COLUMNS A, USER_COL_COMMENTS B"
+				+ " USER_TAB_COLUMNS A, USER_COL_COMMENTS B"
 				+ " WHERE A.TABLE_NAME = B.TABLE_NAME"
 				+ " AND A.COLUMN_NAME = B.COLUMN_NAME"
 				+ " AND A.TABLE_NAME = ?"
@@ -73,7 +73,7 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 	}
 
 	@Override
-	@Cacheable(value = "database", key = "#connectionId.concat(':cols:').concat(#tableName)")
+	@Cacheable(value = ProcessConstants.CACHE_DATABASE, key = "#connectionId.concat(':cols:').concat(#tableName)")
 	public List<ColumnInfo> findColumnsBy(String connectionId, String tableName) {
 		logger.trace("#findColumnsBy");
 		return jdbc.query(SEL_ALL_TAB_COLUMNS, new RowMapper<ColumnInfo>() {
@@ -88,11 +88,11 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 				c.comments = rs.getString("COMMENTS");
 				return c;
 			}
-		}, tableName);
+		}, StringUtils.upperCase(tableName));
 	}
 
 	@Override
-	@Cacheable(value = "database", key = "#connectionId.concat(':pks:').concat(#tableName)")
+	@Cacheable(value = ProcessConstants.CACHE_DATABASE, key = "#connectionId.concat(':pks:').concat(#tableName)")
 	public List<String> findPrimaryKeysBy(String connectionId, String tableName) {
 		logger.trace("#findPrimaryKeysBy");
 		return jdbc.query(SEL_PRIMARY_KEYS, new RowMapper<String>() {
@@ -101,7 +101,7 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
 				return rs.getString(1);
 			}
-		}, tableName);
+		}, StringUtils.upperCase(tableName));
 	}
 
 	private DataType toDataType(String oracleDataType) {
@@ -185,10 +185,10 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 						if (value == null) {
 							values.add(StringUtils.EMPTY);
 						} else if (value instanceof java.sql.Date) {
-							final DateTime dt = new DateTime(((java.sql.Date)value).getTime());
+							final DateTime dt = new DateTime(((java.sql.Date) value).getTime());
 							values.add(dt.toString(DateTimeFormat.mediumDate()));
 						} else if (value instanceof java.sql.Timestamp) {
-							final DateTime dt = new DateTime(((java.sql.Timestamp)value).getTime());
+							final DateTime dt = new DateTime(((java.sql.Timestamp) value).getTime());
 							// Omit when time is 00:00:00.
 							if (dt.equals(dt.withTime(0, 0, 0, 0))) {
 								values.add(dt.toString(DateTimeFormat.mediumDate()));

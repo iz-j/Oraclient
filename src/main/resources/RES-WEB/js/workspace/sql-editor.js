@@ -22,7 +22,7 @@ var SqlEditor = function() {
     $('#btn-format').on('click', fireFormat);
     $('#btn-execute').on('click', fireExecute);
 
-    _textcomplete();
+    _textassist();
   }
 
   function setSql(sql) {
@@ -89,11 +89,10 @@ var SqlEditor = function() {
     }, 300);
   }
 
-  function _textcomplete() {
+  function _textassist() {
     // Setup.
-    $('#sql-editor').textcomplete([{
-      match: /(^|\s)([A-Za-z]\w*)$/,
-      search: function (term, callback) {
+    $('#sql-editor').textassist({
+      find: function(term, callback) {
         $.getJSON('/workspace/sqlCompletions', {
           connectionId: _connectionId,
           term: term,
@@ -104,34 +103,35 @@ var SqlEditor = function() {
           callback([]);
         });
       },
-      replace: function (value) {
-        value = value.replace(/\*/, '');
-        // To avoid replacing white space or line break. Is this correct?
-        var whole = $('#sql-editor').val();
-        var check = whole.match(this.match);
-        if (!check) {
-          return value;
+      ulClassName: 'dropdown-menu sql-editor-suggest',
+      anchorClassName: 'sql-editor-suggest-item',
+      activeClassName: 'active',
+      item: function(source, term) {
+        var display = source;
+        var emphasis = term;
+        var reservedWord = true;
+        if (display.lastIndexOf('*', 0) === 0) {// Items of a table start with '*'.
+          display = display.slice(1);
+          reservedWord = false;
         }
-        var str = check[1];
-        if (str == ' ') {
-          value = ' ' + value;
-        } else if (str == '\n') {
-          value = '\n' + value;
+        if (emphasis) {
+          emphasis = emphasis.toUpperCase();
+          display = display.replace(emphasis, '<b>' + emphasis + '</b>');
         }
-        console.log(value);
-        return value + ' ';
-      },
-      template: function(value) {
-        if (value.lastIndexOf('*', 0) == 0) {
-          return value.replace(/\*/, '');
+        if (reservedWord) {
+          return '<i class="fa fa-database"></i>&nbsp;' + display;
         } else {
-          return '<b>' + value + '</b>';
+          return '<i class="fa fa-table"></i>&nbsp;' + display;
         }
+      },
+      loadingHTML: '&nbsp;<i class="fa fa-spinner fa-2x fa-spin text-muted"></i>&nbsp;<span>Loading...</span>',
+      noneHTML: '&nbsp;<i class="fa fa-ban"></i>&nbsp;<span>Nothing found.</span>',
+      beforeFix: function(source) {
+        return source.lastIndexOf('*', 0) === 0 ? source.slice(1) : source;
+      },
+      afterFix: function(value) {
+        _handleTextChange(null);
       }
-    }], {
-      appendTo: $('#for-textcomplete')// To resolve css conflict!
-    }).on('textComplete:select', function(e, value) {
-      _handleTextChange(e);
     });
   }
 

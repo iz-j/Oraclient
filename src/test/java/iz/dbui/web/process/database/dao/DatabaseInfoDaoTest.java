@@ -1,8 +1,7 @@
 package iz.dbui.web.process.database.dao;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import iz.dbui.AbstractSpringTest;
-import iz.dbui.web.process.database.dao.DatabaseInfoDao;
 import iz.dbui.web.spring.jdbc.ConnectionContext;
 
 import org.apache.commons.lang3.time.StopWatch;
@@ -22,29 +21,19 @@ public class DatabaseInfoDaoTest extends AbstractSpringTest {
 		final StopWatch sw = new StopWatch();
 
 		sw.start();
-		final String tableName1st = dao
-				.findAllTableNames(ConnectionContext.getCurrentId())
-				.stream()
-				.findFirst()
-				.get();
+		dao.findAllTableNames(ConnectionContext.getCurrentId());
 		sw.stop();
 		final long time1st = sw.getTime();
 
 		sw.reset();
 		sw.start();
-		final String tableName2nd = dao
-				.findAllTableNames(ConnectionContext.getCurrentId())
-				.stream()
-				.findFirst()
-				.get();
+		dao.findAllTableNames(ConnectionContext.getCurrentId());
 		sw.stop();
 		final long time2nd = sw.getTime();
 
-		logger.debug("tableName = {} / {}", tableName1st, tableName2nd);
 		logger.debug("time = {} / {}", time1st, time2nd);
 
 		// Check value & cache enabled
-		assertEquals(tableName1st, tableName2nd);
 		assertTrue(time2nd <= time1st);
 	}
 }

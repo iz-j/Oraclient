@@ -9,33 +9,40 @@
 
   <!-- Tools -->
   <div id="tool-area" class="row">
-    <!-- Search tables or querys. -->
+    <!-- Search tables or querys -->
     <div class="col-lg-3 col-sm-6">
       <input id="search-sql" type="hidden" data-placeholder="Search table or template..."  style="width: 100%;"/>
-     </div>
-     <!-- END Search tables or querys. -->
-     <div class="col-lg-9 col-sm-6">
-        <div class="btn-toolbar">
-          <button id="btn-free-sql" class="btn btn-info btn-effect-ripple btn-xs"
-            title="" data-toggle="tooltip" data-original-title="Free SQL (Ctrl+Q)">
-            <i class="fa fa-pencil-square-o"></i>
-          </button>
-          <button id="btn-save-composite" class="btn btn-primary btn-effect-ripple btn-xs"
-            title="" data-toggle="tooltip" data-original-title="Save these as composite">
-            <i class="fa fa-bookmark-o"></i>
-          </button>
-          <button id="btn-clear-cache" class="btn btn-danger btn-effect-ripple btn-xs"
-            title="" data-toggle="tooltip" data-original-title="Clear cache">
-            <i class="fa fa-refresh"></i>
-          </button>
-        </div>
-     </div>
+    </div>
+    <!-- END Search tables or querys -->
+    <div class="col-lg-9 col-sm-6">
+      <!-- Functional buttons -->
+      <div class="btn-toolbar">
+        <button id="btn-free-sql" class="btn btn-info btn-effect-ripple btn-xs"
+          title="" data-toggle="tooltip" data-original-title="Free SQL (Ctrl+Q)">
+          <i class="fa fa-pencil-square-o"></i>
+        </button>
+        <button id="btn-save-composite" class="btn btn-primary btn-effect-ripple btn-xs"
+          title="" data-toggle="tooltip" data-original-title="Save these as composite">
+          <i class="fa fa-bookmark-o"></i>
+        </button>
+        <button id="btn-load-composite" class="btn btn-primary btn-effect-ripple btn-xs"
+          title="" data-toggle="tooltip" data-original-title="Load composite">
+          <i class="fa fa-folder-open-o"></i>
+        </button>
+        <button id="btn-clear-cache" class="btn btn-danger btn-effect-ripple btn-xs"
+          title="" data-toggle="tooltip" data-original-title="Clear cache">
+          <i class="fa fa-refresh"></i>
+        </button>
+      </div>
+      <!-- END Functional buttons -->
+    </div>
   </div>
   <!-- END Tools -->
 
   <!-- List of SQLs -->
   <div id="list-area" class="row">
     <div id="list-col" class="col-lg-12">
+      <span id="composite-info" class="label label-default">Do as you please</span>
       <div id="sql-list"></div>
     </div>
   </div>
@@ -55,7 +62,7 @@
           <i class="fa fa-bolt"></i>
         </button>
       </div>
-      <textarea id="sql-editor" class="form-control" wrap="off" placeholder="SQL sentence..."></textarea>
+      <textarea id="sql-editor" class="form-control" spellcheck="false" placeholder="SQL sentence..."></textarea>
     </div>
     <!-- END SQL Editor -->
     <!-- Processor adaptor -->
@@ -100,14 +107,43 @@
       </div>
     </div>
   </div>
-  <!-- END Connection Dialog -->
+  <!-- END Naming Dialog -->
+  
+  <!-- Composite Dialog -->
+  <div id="composite-dialog" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 class="modal-title">
+            <strong>Choose Composite</strong>
+          </h3>
+        </div>
+        <div class="modal-body">
+          <div>
+            <input id="composite-filter" type="text" class="form-control" placeholder="Filter composites..." />
+          </div>
+          <br />
+          <div id="composite-list" class="list-group">
+            <p>No composites...</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-effect-ripple btn-danger" data-dismiss="modal">
+            <span class="btn-ripple animate"></span>Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- END Composite Dialog -->
 
-  <div id="for-textcomplete"></div>
 </div>
 
 <object th:fragment="script" th:remove="tag">
-  <script type="text/javascript" th:src="@{/lib/textcomplete/jquery.textcomplete.js}"></script>
+  <script type="text/javascript" th:src="@{/lib/textassist/textassist.js}"></script>
   <script type="text/javascript" th:src="@{/js/workspace/naming-dialog.js}"></script>
+  <script type="text/javascript" th:src="@{/js/workspace/composite-dialog.js}"></script>
   <script type="text/javascript" th:src="@{/js/workspace/sql-list.js}"></script>
   <script type="text/javascript" th:src="@{/js/workspace/sql-editor.js}"></script>
   <script type="text/javascript" th:src="@{/js/workspace/processor-adaptor.js}"></script>

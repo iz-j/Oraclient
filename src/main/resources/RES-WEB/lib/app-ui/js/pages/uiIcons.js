@@ -5,6 +5,7 @@
  */
 
 var UiIcons = function() {
+    var $searchItems, $searchValue;
 
     return {
         init: function() {
@@ -25,6 +26,26 @@ var UiIcons = function() {
                     .animate({ scrollTop: $('#icon-gen').offset().top - 15 });
 
                 return false;
+            });
+
+            // Search functionality
+            $searchItems = $('.js-icon-list a');
+
+            $('.js-icon-search').on('keyup', function(){ // When user types
+                $searchValue = $(this).val().toLowerCase();
+
+                if ($searchValue.length > 2) { // If more than 2 characters, search the icons
+                    $searchItems.hide();
+
+                    $searchItems
+                        .each(function(){
+                            if ($('i', this).attr('class').match($searchValue)) {
+                                $(this).show();
+                            }
+                        });
+                } else if ($searchValue.length === 0) { // If text deleted show all icons
+                    $searchItems.show();
+                }
             });
         }
     };
