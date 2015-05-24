@@ -21,6 +21,7 @@ var SqlList = function() {
     }
     var el = $(html);
     $('#sql-list').append(el);
+    $('#sql-list [data-toggle="tooltip"]').tooltip();
     // Select first element and show.
     var id = el.first().children().first().data('id');
     _select(id);

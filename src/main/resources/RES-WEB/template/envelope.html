@@ -78,20 +78,19 @@
                 <i class="gi gi-settings"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-right">
-                <li class="dropdown-header"><strong>名前とか役割とか</strong></li>
-                <li><a href="page_app_social.html"> <i class="fa fa-pencil-square fa-fw pull-right"></i>
-                    Profile
-                </a></li>
-                <li><a href="javascript:void(0)" onclick="App.sidebar('toggle-sidebar-alt');"> <i
-                    class="gi gi-settings fa-fw pull-right"></i> Settings
-                </a></li>
-                <li class="divider"></li>
-                <li><a href="javascript:void(0)" onclick="Re_Header.logout();"> <i
-                    class="fa fa-power-off fa-fw pull-right"></i> Log out
-                </a>
-                  <form th:action="@{/page/base/header/logout}" method="post" id="re-logout" style="display: none;"></form>
+                <li class="dropdown-header"><strong>Maintenance</strong></li>
+                <li>
+                  <a href="/templates">
+                    <i class="fa fa-pencil fa-fw pull-right"></i> Templates
+                  </a>
                 </li>
-              </ul></li>
+                <li>
+                  <a href="/composites">
+                    <i class="fa fa-pencil fa-fw pull-right"></i> Composites
+                  </a>
+                </li>
+              </ul>
+            </li>
             <!-- END User Dropdown -->
             <li th:unless="${'connections'.equals(#strings.toLowerCase(_pageTitle))}">
               <a href="/connections"><i class="fa fa-sign-out"></i></a>

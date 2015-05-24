@@ -86,6 +86,19 @@ public class DatabaseServiceImpl implements DatabaseService {
 	}
 
 	@Override
+	public List<SqlTemplate> getAllSqlTemplate() {
+		final SqlTemplates templates = AppDataManager.load(SqlTemplates.class);
+		return templates.getTemplates().values().stream().sorted(SqlTemplate.COMPARATOR).collect(Collectors.toList());
+	}
+
+	@Override
+	public void removeSqlTemplate(String id) {
+		final SqlTemplates templates = AppDataManager.load(SqlTemplates.class);
+		templates.getTemplates().remove(id);
+		AppDataManager.save(templates);
+	}
+
+	@Override
 	public ExecutionResult executeSql(SqlTemplate sql) throws DatabaseException {
 		final AnalysisResult analysisResult = SqlAnalyzer.analyze(sql.sentence);
 		logger.trace("SQL analized -> {}", analysisResult);
@@ -153,8 +166,8 @@ public class DatabaseServiceImpl implements DatabaseService {
 				dbDao.executeUpdate(sql);
 
 				// Set new rowid for client.
-				retval.put(rowid, RowidHelper.createRowid(values, columns, pks, rowid));
-			});
+					retval.put(rowid, RowidHelper.createRowid(values, columns, pks, rowid));
+				});
 
 			// Handle delete.
 			changes.removedRowids.forEach(rowid -> {

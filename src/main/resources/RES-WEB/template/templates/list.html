@@ -1,0 +1,16 @@
+<tr th:each="t : ${templates}" th:if="${templates.size() > 0}">
+  <td th:text="${t.name}"></td>
+  <td>
+    <pre th:text="${t.sentence}" class="sql-sentence"></pre>
+  </td>
+  <td class="text-center">
+    <a href="javascript:void(0)" class="btn btn-effect-ripple btn-xs btn-danger remove-btn" title=""
+      data-toggle="tooltip" data-original-title="Delete" th:attr="data-id=${t.id},data-name=${t.name}">
+      <i class="fa fa-times"></i>
+    </a>
+  </td>
+</tr>
+
+<tr th:if="${templates.size() == 0}">
+  <td colspan="7"><h3>No templates.</h3></td>
+</tr>

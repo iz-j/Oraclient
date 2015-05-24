@@ -33,7 +33,7 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 
 	private static final String SEL_ALL_TABLES;
 	static {
-		SEL_ALL_TABLES = "SELECT * FROM USER_TABLES WHERE ORDER BY TABLE_NAME";
+		SEL_ALL_TABLES = "SELECT * FROM USER_TABLES ORDER BY TABLE_NAME";
 	}
 
 	private static final String SEL_ALL_TAB_COLUMNS;
@@ -134,7 +134,7 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 
 			@Override
 			public Pair<List<ColumnInfo>, List<List<String>>> extractData(ResultSet rs) throws SQLException,
-			DataAccessException {
+					DataAccessException {
 				final List<ColumnInfo> columns = new ArrayList<>();
 				final List<List<String>> records = new ArrayList<>();
 

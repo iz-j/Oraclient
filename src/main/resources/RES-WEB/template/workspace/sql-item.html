@@ -3,8 +3,10 @@
     th:attr="data-id=${sql.id},data-type=${sql.type},data-table-name=${sql.tableName}">
     <div class="widget-content widget-content-mini themed-background text-light sql-item-name">
       <div class="pull-right">
-        <i class="fa fa-bookmark-o sql-item-save"></i>&nbsp;
-        <i class="fa fa-times sql-item-remove"></i>
+        <i class="fa fa-bookmark-o sql-item-save"
+          title="" data-toggle="tooltip" data-original-title="Save as template" data-placement="bottom"></i>&nbsp;
+        <i class="fa fa-times sql-item-remove"
+          title="" data-toggle="tooltip" data-original-title="Remove" data-placement="bottom"></i>
       </div>
       <i class="fa" th:classappend="${sql.type.toString().equals('TABLE')} ? 'fa-table' : 'fa-file-text-o'"></i>&nbsp;
       <strong class="sql-name" th:text="${sql.name}"></strong>

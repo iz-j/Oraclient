@@ -20,6 +20,10 @@ public interface DatabaseService {
 
 	List<SqlTemplate> getMatchedSqlTemplates(String term);
 
+	List<SqlTemplate> getAllSqlTemplate();
+
+	void removeSqlTemplate(String id);
+
 	ExecutionResult executeSql(SqlTemplate sql) throws DatabaseException;
 
 	@Transactional(rollbackFor = { DatabaseException.class })

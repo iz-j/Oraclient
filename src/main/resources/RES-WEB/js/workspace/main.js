@@ -28,6 +28,7 @@ var Workspace = function() {
     _setupSearch();
 
     $('#btn-free-sql').on('click', fireNewFreeSql);
+    $('#btn-clear-sql').on('click', _handleClearSqlClick)
     $('#btn-save-composite').on('click', _handleSaveCompositeClick);
     $('#btn-load-composite').on('click', _handleLoadCompositeClick);
     $('#btn-clear-cache').on('click', _handleClearCacheClick);
@@ -155,6 +156,11 @@ var Workspace = function() {
     }, $('#composite-info').data('id') ? $('#composite-info').text() : '');
   }
   
+  function _handleClearSqlClick() {
+    SqlList.clear();
+    _setCompositeInfo(null);
+  }
+  
   function _handleLoadCompositeClick() {
     CompositeDialog.show(function(composite) {
       $.ajax({
@@ -173,15 +179,19 @@ var Workspace = function() {
 
   function _handleSqlListRemove(sql) {
     if (SqlList.isEmpty()) {
-      $('#composite-info').text('Do as you please')
-        .removeData('id').removeClass('label-info').addClass('label-default');
+      _setCompositeInfo(null);
     }
     ProcessorAdaptor.removeSql(sql);
   }
   
   function _setCompositeInfo(composite) {
-    $('#composite-info').text(composite.name)
-      .data('id', composite.id).removeClass('label-default').addClass('label-info');
+    if (composite) {
+      $('#composite-info').text(composite.name)
+        .data('id', composite.id).removeClass('label-default').addClass('label-info');
+    } else {
+      $('#composite-info').text('Do as you please')
+        .removeData('id').removeClass('label-info').addClass('label-default');
+    }
   }
   
   return {

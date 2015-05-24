@@ -25,7 +25,6 @@ public class ConnectionsController {
 	public ModelAndView page() {
 		logger.trace("#page");
 		final ModelAndView mv = ControllerHelper.createModelAndViewForPage("connections/main", "Connections");
-		mv.addObject("connections", service.getAll());
 		return mv;
 	}
 
