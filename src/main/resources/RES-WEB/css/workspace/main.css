@@ -107,3 +107,7 @@
   max-height: 240px;
   overflow: auto;
 }
+
+#composite-list > a {
+  overflow-wrap: break-word;
+}

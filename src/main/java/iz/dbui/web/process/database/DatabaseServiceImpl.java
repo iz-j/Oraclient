@@ -166,8 +166,8 @@ public class DatabaseServiceImpl implements DatabaseService {
 				dbDao.executeUpdate(sql);
 
 				// Set new rowid for client.
-					retval.put(rowid, RowidHelper.createRowid(values, columns, pks, rowid));
-				});
+				retval.put(rowid, RowidHelper.createRowid(values, columns, pks, rowid));
+			});
 
 			// Handle delete.
 			changes.removedRowids.forEach(rowid -> {
@@ -254,6 +254,13 @@ public class DatabaseServiceImpl implements DatabaseService {
 		all.getComposites().put(composite.id, composite);
 		AppDataManager.save(all);
 		logger.trace("SqlTemplate saved. total = {}", all.getComposites().size());
+	}
+
+	@Override
+	public void removeSqlComposite(String id) {
+		final SqlComposites composites = AppDataManager.load(SqlComposites.class);
+		composites.getComposites().remove(id);
+		AppDataManager.save(composites);
 	}
 
 }

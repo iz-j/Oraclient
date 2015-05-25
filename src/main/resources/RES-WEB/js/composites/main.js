@@ -1,19 +1,15 @@
-/**
- * Connection list.
- */
-
-var ConnectionList = function() {
+var CompositeList = function() {
 
   var _onRemove = null;
 
   // PUBLIC --------------------------------------------------
 
   function init() {
-    $('#connection-list').on('click', _handleClick);
+    $('#list').on('click', _handleClick);
   }
 
   function setContent(html) {
-    $('#connection-list').find('tbody').empty().append(html);
+    $('#list').find('tbody').empty().append(html);
   }
 
   function setOnRemove(fn) {
@@ -41,3 +37,29 @@ var ConnectionList = function() {
   };
 }();
 
+
+
+$(function() {
+  CompositeList.init();
+
+  // Load.
+  $.ajax({
+    url: '/composites/list',
+    dataType: 'html'
+  }).done(function(res) {
+    CompositeList.setContent(res);
+  });
+
+  // Remove.
+  CompositeList.setOnRemove(function(id, name) {
+    $.ajax({
+      url: '/composites/remove',
+      type: 'post',
+      data: { id: id },
+      dataType: 'html'
+    }).done(function(res) {
+      CompositeList.setContent(res);
+      Base.growl('Composite "' + name + '" was removed.');
+    });
+  });
+});

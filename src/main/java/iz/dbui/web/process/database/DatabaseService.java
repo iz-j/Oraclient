@@ -38,4 +38,6 @@ public interface DatabaseService {
 	SqlComposite getSqlComposite(String id);
 
 	void save(SqlComposite composite);
+
+	void removeSqlComposite(String id);
 }
