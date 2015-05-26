@@ -1,21 +1,18 @@
 package iz.dbui.web.process.database;
 
-import iz.dbui.base.AppDataManager;
 import iz.dbui.web.process.database.dao.DatabaseInfoDao;
 import iz.dbui.web.process.database.dto.ColumnInfo;
 import iz.dbui.web.process.database.dto.ExecutionResult;
 import iz.dbui.web.process.database.dto.LocalChanges;
-import iz.dbui.web.process.database.dto.SqlComposite;
-import iz.dbui.web.process.database.dto.SqlComposites;
 import iz.dbui.web.process.database.dto.SqlTemplate;
 import iz.dbui.web.process.database.dto.SqlTemplate.TemplateType;
-import iz.dbui.web.process.database.dto.SqlTemplates;
 import iz.dbui.web.process.database.helper.ColumnInfoHelper;
 import iz.dbui.web.process.database.helper.MergeSqlBuilder;
 import iz.dbui.web.process.database.helper.RowidHelper;
 import iz.dbui.web.process.database.helper.SqlAnalyzer;
 import iz.dbui.web.process.database.helper.SqlAnalyzer.AnalysisResult;
 import iz.dbui.web.process.database.other.SqlCompletionWords;
+import iz.dbui.web.process.users.UserDataService;
 import iz.dbui.web.spring.jdbc.ConnectionContext;
 import iz.dbui.web.spring.jdbc.DatabaseException;
 
@@ -25,11 +22,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.Pair;
@@ -45,6 +40,9 @@ public class DatabaseServiceImpl implements DatabaseService {
 
 	private static final String NEW_REC_ROWID_PREFIX = "new$";
 	private static final String TABLE_ITEM_PREFIX = "*";
+
+	@Autowired
+	private UserDataService userDataService;
 
 	@Autowired
 	private DatabaseInfoDao dbDao;
@@ -69,10 +67,8 @@ public class DatabaseServiceImpl implements DatabaseService {
 		}).filter(filter).limit(50).collect(Collectors.toList()));
 
 		// Retrieve custom registered.
-		final SqlTemplates registered = AppDataManager.load(SqlTemplates.class);
+		final List<SqlTemplate> registered = userDataService.getSqlTemplates();
 		templates.addAll(registered
-				.getTemplates()
-				.values()
 				.stream()
 				.filter(filter)
 				.limit(50)
@@ -83,19 +79,6 @@ public class DatabaseServiceImpl implements DatabaseService {
 
 		logger.trace("{} templates found.", templates.size());
 		return templates;
-	}
-
-	@Override
-	public List<SqlTemplate> getAllSqlTemplate() {
-		final SqlTemplates templates = AppDataManager.load(SqlTemplates.class);
-		return templates.getTemplates().values().stream().sorted(SqlTemplate.COMPARATOR).collect(Collectors.toList());
-	}
-
-	@Override
-	public void removeSqlTemplate(String id) {
-		final SqlTemplates templates = AppDataManager.load(SqlTemplates.class);
-		templates.getTemplates().remove(id);
-		AppDataManager.save(templates);
 	}
 
 	@Override
@@ -166,8 +149,8 @@ public class DatabaseServiceImpl implements DatabaseService {
 				dbDao.executeUpdate(sql);
 
 				// Set new rowid for client.
-				retval.put(rowid, RowidHelper.createRowid(values, columns, pks, rowid));
-			});
+					retval.put(rowid, RowidHelper.createRowid(values, columns, pks, rowid));
+				});
 
 			// Handle delete.
 			changes.removedRowids.forEach(rowid -> {
@@ -184,17 +167,6 @@ public class DatabaseServiceImpl implements DatabaseService {
 			ex.setRowid(rowidHolder.getValue());
 			throw ex;
 		}
-	}
-
-	@Override
-	public void save(SqlTemplate sql) {
-		final SqlTemplates all = AppDataManager.load(SqlTemplates.class);
-		if (all.getTemplates().containsKey(sql.id)) {
-			logger.debug("Overwrite SqlTemplate. id = {}", sql.id);
-		}
-		all.getTemplates().put(sql.id, sql);
-		AppDataManager.save(all);
-		logger.trace("SqlTemplate saved. total = {}", all.getTemplates().size());
 	}
 
 	@Override
@@ -227,40 +199,6 @@ public class DatabaseServiceImpl implements DatabaseService {
 			}
 		};
 		return retval.stream().sorted(comparator).collect(Collectors.toList());
-	}
-
-	@Override
-	public List<SqlComposite> getAllSqlComposite() {
-		return AppDataManager.load(SqlComposites.class).getComposites().values().stream().sorted((c1, c2) -> {
-			return ObjectUtils.compare(c1.name, c2.name);
-		}).collect(Collectors.toList());
-	}
-
-	@Override
-	public SqlComposite getSqlComposite(String id) {
-		return AppDataManager.load(SqlComposites.class).getComposites().get(id);
-	}
-
-	@Override
-	public void save(SqlComposite composite) {
-		if (StringUtils.isEmpty(composite.id)) {
-			composite.id = UUID.randomUUID().toString();
-		}
-
-		final SqlComposites all = AppDataManager.load(SqlComposites.class);
-		if (all.getComposites().containsKey(composite.id)) {
-			logger.debug("Overwrite SqlComposite. id = {}", composite.id);
-		}
-		all.getComposites().put(composite.id, composite);
-		AppDataManager.save(all);
-		logger.trace("SqlTemplate saved. total = {}", all.getComposites().size());
-	}
-
-	@Override
-	public void removeSqlComposite(String id) {
-		final SqlComposites composites = AppDataManager.load(SqlComposites.class);
-		composites.getComposites().remove(id);
-		AppDataManager.save(composites);
 	}
 
 }

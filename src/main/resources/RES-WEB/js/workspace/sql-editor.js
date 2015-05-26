@@ -79,6 +79,12 @@ var SqlEditor = function() {
   function _disableButtons(disabled) {
     $('#btn-format').prop('disabled', disabled);
     $('#btn-execute').prop('disabled', disabled);
+    if (disabled || _sql.type !== 'TABLE') {
+      $('#btn-table-info').hide();
+    } else {
+      $('#btn-table-info').show();
+      $('#current-table-name').text(_sql.tableName);
+    }
   }
 
   function _handleTextChange(e) {

@@ -13,7 +13,6 @@ public final class ColumnInfo {
 		STRING, NUMBER, DATE, OTHER;
 	}
 
-	public String owner;
 	public String tableName;
 	public String columnName;
 	public DataType dataType;
@@ -21,16 +20,7 @@ public final class ColumnInfo {
 
 	@Override
 	public String toString() {
-		return "ColumnInfo [owner="
-				+ owner
-				+ ", tableName="
-				+ tableName
-				+ ", columnName="
-				+ columnName
-				+ ", dataType="
-				+ dataType
-				+ ", comments="
-				+ comments
-				+ "]";
+		return "ColumnInfo [tableName=" + tableName + ", columnName=" + columnName + ", dataType=" + dataType
+				+ ", comments=" + comments + "]";
 	}
 }

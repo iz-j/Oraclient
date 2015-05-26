@@ -1,6 +1,6 @@
 package iz.dbui.web.controller;
 
-import iz.dbui.web.process.database.DatabaseService;
+import iz.dbui.web.process.users.UserDataService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ public class CompositesController {
 	private static final Logger logger = LoggerFactory.getLogger(CompositesController.class);
 
 	@Autowired
-	private DatabaseService service;
+	private UserDataService service;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public ModelAndView page() {
@@ -30,7 +30,7 @@ public class CompositesController {
 	public ModelAndView getComposites() {
 		logger.trace("#getComposites");
 		final ModelAndView mv = new ModelAndView("composites/list");
-		mv.addObject("composites", service.getAllSqlComposite());
+		mv.addObject("composites", service.getSqlComposites());
 		return mv;
 	}
 

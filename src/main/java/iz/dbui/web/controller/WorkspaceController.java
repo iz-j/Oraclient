@@ -7,6 +7,7 @@ import iz.dbui.web.process.database.DatabaseService;
 import iz.dbui.web.process.database.dto.SqlComposite;
 import iz.dbui.web.process.database.dto.SqlTemplate;
 import iz.dbui.web.process.database.helper.SqlFormatter;
+import iz.dbui.web.process.users.UserDataService;
 import iz.dbui.web.spring.jdbc.ConnectionContext;
 import iz.dbui.web.spring.jdbc.DatabaseException;
 
@@ -39,6 +40,8 @@ public class WorkspaceController {
 
 	@Autowired
 	private DatabaseService dbService;
+	@Autowired
+	private UserDataService usrService;
 
 	@Autowired
 	private CacheManager cacheManager;
@@ -97,7 +100,7 @@ public class WorkspaceController {
 	@ResponseStatus(HttpStatus.OK)
 	public void saveTemplate(@RequestBody SqlTemplate sqlTemplate) {
 		logger.trace("#saveTemplate");
-		dbService.save(sqlTemplate);
+		usrService.save(sqlTemplate);
 	}
 
 	@RequestMapping(value = "/clearCache", method = RequestMethod.POST)
@@ -119,19 +122,19 @@ public class WorkspaceController {
 	@RequestMapping(value = "/sqlComposites", method = RequestMethod.GET)
 	public @ResponseBody List<SqlComposite> getSqlComposites() {
 		logger.trace("#getSqlComposites");
-		return dbService.getAllSqlComposite();
+		return usrService.getSqlComposites();
 	}
 
 	@RequestMapping(value = "/saveComposite", method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.OK)
 	public void saveComposite(@RequestBody SqlComposite sqlComposite) {
 		logger.trace("#saveComposite");
-		dbService.save(sqlComposite);
+		usrService.save(sqlComposite);
 	}
 
 	@RequestMapping(value = "/sqlComposite", method = RequestMethod.GET)
 	public @ResponseBody SqlComposite getSqlComposite(@RequestParam("id") String id) {
 		logger.trace("#getSqlComposite id = {}", id);
-		return dbService.getSqlComposite(id);
+		return usrService.getSqlComposite(id);
 	}
 }

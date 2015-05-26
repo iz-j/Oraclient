@@ -81,7 +81,6 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 			@Override
 			public ColumnInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
 				final ColumnInfo c = new ColumnInfo();
-				c.owner = rs.getString("OWNER");
 				c.tableName = rs.getString("TABLE_NAME");
 				c.columnName = rs.getString("COLUMN_NAME");
 				c.dataType = toDataType(rs.getString("DATA_TYPE"));
@@ -134,7 +133,7 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 
 			@Override
 			public Pair<List<ColumnInfo>, List<List<String>>> extractData(ResultSet rs) throws SQLException,
-					DataAccessException {
+			DataAccessException {
 				final List<ColumnInfo> columns = new ArrayList<>();
 				final List<List<String>> records = new ArrayList<>();
 

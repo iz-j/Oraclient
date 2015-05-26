@@ -1,6 +1,6 @@
 package iz.dbui.web.controller;
 
-import iz.dbui.web.process.database.DatabaseService;
+import iz.dbui.web.process.users.UserDataService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ public class TemplatesController {
 	private static final Logger logger = LoggerFactory.getLogger(TemplatesController.class);
 
 	@Autowired
-	private DatabaseService service;
+	private UserDataService service;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public ModelAndView page() {
@@ -30,7 +30,7 @@ public class TemplatesController {
 	public ModelAndView getTemplates() {
 		logger.trace("#getTemplates");
 		final ModelAndView mv = new ModelAndView("templates/list");
-		mv.addObject("templates", service.getAllSqlTemplate());
+		mv.addObject("templates", service.getSqlTemplates());
 		return mv;
 	}
 
