@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public interface UserDataService {

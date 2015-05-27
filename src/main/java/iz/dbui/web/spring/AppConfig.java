@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 @Configuration

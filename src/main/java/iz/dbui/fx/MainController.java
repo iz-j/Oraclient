@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Controller for FX.
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public class MainController implements Initializable {

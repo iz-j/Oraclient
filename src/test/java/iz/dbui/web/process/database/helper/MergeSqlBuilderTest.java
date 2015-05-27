@@ -1,8 +1,8 @@
 package iz.dbui.web.process.database.helper;
 
 import static org.junit.Assert.*;
-import iz.dbui.web.process.database.dto.ColumnInfo;
-import iz.dbui.web.process.database.dto.ColumnInfo.DataType;
+import iz.dbui.web.process.database.dto.Column;
+import iz.dbui.web.process.database.dto.Column.DataType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,22 +21,22 @@ public class MergeSqlBuilderTest {
 
 	private static final String TABLE_NAME = "HOGE";
 
-	private static final List<ColumnInfo> COLUMNS;
+	private static final List<Column> COLUMNS;
 	static {
 		COLUMNS = new ArrayList<>();
-		ColumnInfo c = new ColumnInfo();
+		Column c = new Column();
 		c.columnName = "ID";
 		c.dataType = DataType.NUMBER;
 		COLUMNS.add(c);
-		c = new ColumnInfo();
+		c = new Column();
 		c.columnName = "TXT";
 		c.dataType = DataType.STRING;
 		COLUMNS.add(c);
-		c = new ColumnInfo();
+		c = new Column();
 		c.columnName = "DT";
 		c.dataType = DataType.DATE;
 		COLUMNS.add(c);
-		c = new ColumnInfo();
+		c = new Column();
 		c.columnName = "NA";
 		c.dataType = DataType.OTHER;
 		COLUMNS.add(c);

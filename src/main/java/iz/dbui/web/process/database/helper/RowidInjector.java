@@ -22,7 +22,7 @@ import com.foundationdb.sql.unparser.NodeToString;
 
 /**
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 @Deprecated

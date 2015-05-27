@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Launch server directly.
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public final class DbUiServerMain {

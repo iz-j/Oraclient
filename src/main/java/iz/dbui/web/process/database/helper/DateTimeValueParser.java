@@ -12,7 +12,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 /**
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public final class DateTimeValueParser {

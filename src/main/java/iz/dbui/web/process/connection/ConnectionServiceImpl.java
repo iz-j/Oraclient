@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 /**
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 @Service

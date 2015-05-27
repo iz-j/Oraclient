@@ -137,4 +137,14 @@ public class WorkspaceController {
 		logger.trace("#getSqlComposite id = {}", id);
 		return usrService.getSqlComposite(id);
 	}
+
+	@RequestMapping(value = "/tableInfoView", method = RequestMethod.GET)
+	public ModelAndView tableInfoView(@RequestParam("connectionId") String connectionId,
+			@RequestParam(value = "tableName") String tableName) {
+		logger.trace("#tableInfoView tableName = {}", tableName);
+		final ModelAndView mv = new ModelAndView("workspace/table-info");
+		ConnectionContext.setId(connectionId);
+		mv.addObject("tableInfo", dbService.getTableInfoOf(tableName));
+		return mv;
+	}
 }

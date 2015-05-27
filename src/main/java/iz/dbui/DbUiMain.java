@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 /**
  * Launch JavaFX application.
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public final class DbUiMain extends Application {

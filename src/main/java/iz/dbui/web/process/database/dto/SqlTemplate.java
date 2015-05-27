@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public class SqlTemplate {

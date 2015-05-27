@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public final class StatementManager extends AbstractCreateStatementInterceptor {

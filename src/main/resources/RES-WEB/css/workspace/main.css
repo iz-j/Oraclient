@@ -128,3 +128,7 @@
 #composite-list > a {
   overflow-wrap: break-word;
 }
+
+#table-info-dialog .tab-pane {
+  padding-top: 5px;
+}

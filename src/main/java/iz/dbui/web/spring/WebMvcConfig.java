@@ -28,7 +28,7 @@ import org.thymeleaf.templateresolver.TemplateResolver;
  * </ul>
  * and so on.
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 @Configuration

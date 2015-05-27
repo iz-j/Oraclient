@@ -21,6 +21,7 @@ var SqlEditor = function() {
     $('#sql-editor').prop('disabled', true).on('input propertychange', _handleTextChange);
     $('#btn-format').on('click', fireFormat);
     $('#btn-execute').on('click', fireExecute);
+    $('#btn-table-info').on('click', _handleTableInfoClick);
 
     _textassist();
   }
@@ -93,6 +94,10 @@ var SqlEditor = function() {
       _sql.sentence = $('#sql-editor').val();
       _onChange && _onChange(_sql);
     }, 300);
+  }
+  
+  function _handleTableInfoClick() {
+    TableInfoDialog.show(_sql.tableName);
   }
 
   function _textassist() {

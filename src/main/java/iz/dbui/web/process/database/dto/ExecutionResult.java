@@ -4,14 +4,14 @@ import java.util.List;
 
 /**
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public class ExecutionResult {
 	/**
 	 * If holds query result, this is true.
 	 */
-	public boolean query = true;
+	public boolean query = false;
 
 	/**
 	 * If holds query result, it is true when primary keys are set.
@@ -24,7 +24,7 @@ public class ExecutionResult {
 	/**
 	 * Column informations.
 	 */
-	public List<ColumnInfo> columns;
+	public List<Column> columns;
 	/**
 	 * Column names.
 	 */

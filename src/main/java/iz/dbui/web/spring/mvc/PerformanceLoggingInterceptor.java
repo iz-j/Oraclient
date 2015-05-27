@@ -12,7 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 /**
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public class PerformanceLoggingInterceptor implements HandlerInterceptor {
@@ -44,9 +44,13 @@ public class PerformanceLoggingInterceptor implements HandlerInterceptor {
 
 		String handlerName = "anonymous";
 		if (handler instanceof HandlerMethod) {
-			final HandlerMethod handlerMethod = (HandlerMethod)handler;
+			final HandlerMethod handlerMethod = (HandlerMethod) handler;
 			handlerName = handlerMethod.getBeanType().getName() + "#" + handlerMethod.getMethod().getName();
 		}
+		if (ex != null) {
+			logger.error("Error occured!", ex);
+		}
+
 		logger.debug("Response time = {}ms. Handler = {}", swHolder.get().getTime(), handlerName);
 	}
 

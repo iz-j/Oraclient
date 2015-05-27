@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Launch your web application project via Jetty.
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public final class ViaJetty {
@@ -31,7 +31,7 @@ public final class ViaJetty {
 	/**
 	 * Instead of ServletContainerInitializer.
 	 *
-	 * @author izumi_j
+	 * @author iz_j
 	 *
 	 */
 	private static class JettyStartingListener extends AbstractLifeCycleListener {

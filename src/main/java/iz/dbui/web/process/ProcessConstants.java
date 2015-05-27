@@ -2,7 +2,7 @@ package iz.dbui.web.process;
 
 /**
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public final class ProcessConstants {

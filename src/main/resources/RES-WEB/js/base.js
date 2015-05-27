@@ -52,7 +52,9 @@ $(function() {
   var _xhrs = {};
   var _xhrId = 0;
 
-  // Ajax handling.
+  /*
+   * Ajax handling.
+   */
   $(document).on('ajaxSend', function(event, xhr, options) {
     // Abort request when page will chage.
     $(window).on('beforeunload.Base', function() {
@@ -78,5 +80,5 @@ $(function() {
       url: '/abortSql',
       type: 'post'
     });
-  })
+  });
 });

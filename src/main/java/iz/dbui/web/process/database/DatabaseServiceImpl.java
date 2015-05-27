@@ -1,11 +1,12 @@
 package iz.dbui.web.process.database;
 
 import iz.dbui.web.process.database.dao.DatabaseInfoDao;
-import iz.dbui.web.process.database.dto.ColumnInfo;
+import iz.dbui.web.process.database.dto.Column;
 import iz.dbui.web.process.database.dto.ExecutionResult;
 import iz.dbui.web.process.database.dto.LocalChanges;
 import iz.dbui.web.process.database.dto.SqlTemplate;
 import iz.dbui.web.process.database.dto.SqlTemplate.TemplateType;
+import iz.dbui.web.process.database.dto.definition.TableInfo;
 import iz.dbui.web.process.database.helper.ColumnInfoHelper;
 import iz.dbui.web.process.database.helper.MergeSqlBuilder;
 import iz.dbui.web.process.database.helper.RowidHelper;
@@ -91,7 +92,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 		try {
 			switch (analysisResult) {
 			case QUERY:
-				final Pair<List<ColumnInfo>, List<List<String>>> queryResult = dbDao.executeQuery(sql.sentence);
+				final Pair<List<Column>, List<List<String>>> queryResult = dbDao.executeQuery(sql.sentence);
 				result.query = true;
 				result.columns = queryResult.getLeft();
 				result.records = queryResult.getRight();
@@ -99,7 +100,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 				// Determine editable or not.
 				List<String> pks = null;
 				if (sql.type == TemplateType.TABLE) {
-					pks = dbDao.findPrimaryKeysBy(ConnectionContext.getCurrentId(), sql.tableName);
+					pks = dbDao.findPrimaryKeysBy(sql.tableName);
 					result.tableName = sql.tableName;
 					result.editable = ColumnInfoHelper.containsAll(result.columns, pks);
 					logger.trace("editable = {}", result.editable);
@@ -132,9 +133,9 @@ public class DatabaseServiceImpl implements DatabaseService {
 		final MutableObject<String> rowidHolder = new MutableObject<>();
 		try {
 			final String tableName = changes.tableName;
-			final List<ColumnInfo> columns = changes.columns;
+			final List<Column> columns = changes.columns;
 
-			final List<String> pks = dbDao.findPrimaryKeysBy(ConnectionContext.getCurrentId(), changes.tableName);
+			final List<String> pks = dbDao.findPrimaryKeysBy(changes.tableName);
 
 			// Handle insert and update.
 			changes.editedMap.forEach((rowid, values) -> {
@@ -180,7 +181,10 @@ public class DatabaseServiceImpl implements DatabaseService {
 
 		// Get column names.
 		if (StringUtils.isNotEmpty(tableName)) {
-			final List<ColumnInfo> columns = dbDao.findColumnsBy(ConnectionContext.getCurrentId(), tableName);
+			final List<Column> columns = dbDao.findColumnsBy(ConnectionContext.getCurrentId(), tableName).stream()
+					.map(c -> {
+						return c;
+					}).collect(Collectors.toList());
 			retval.addAll(ColumnInfoHelper.toColumnNames(columns).stream().filter(filter).map(columnName -> {
 				return TABLE_ITEM_PREFIX + columnName;
 			}).collect(Collectors.toList()));
@@ -201,4 +205,16 @@ public class DatabaseServiceImpl implements DatabaseService {
 		return retval.stream().sorted(comparator).collect(Collectors.toList());
 	}
 
+	@Override
+	public TableInfo getTableInfoOf(String tableName) {
+		final TableInfo t = dbDao.findTableBy(tableName);
+		t.columns = dbDao.findColumnsBy(tableName);
+
+		final List<String> pks = dbDao.findPrimaryKeysBy(tableName);
+		t.columns.forEach(c -> {
+			c.isKey = pks.indexOf(c.columnName) > -1;
+		});
+
+		return t;
+	}
 }

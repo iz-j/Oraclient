@@ -1,6 +1,6 @@
 package iz.dbui.web.process.database.helper;
 
-import iz.dbui.web.process.database.dto.ColumnInfo;
+import iz.dbui.web.process.database.dto.Column;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public final class RowidHelper {
@@ -26,7 +26,7 @@ public final class RowidHelper {
 	 * @param columns
 	 * @param pks
 	 */
-	public static void allocateRowid(List<List<String>> records, List<ColumnInfo> columns, List<String> pks) {
+	public static void allocateRowid(List<List<String>> records, List<Column> columns, List<String> pks) {
 		final List<Integer> pkIndexes = ColumnInfoHelper.primaryKeyIndexes(columns, pks);
 
 		records.forEach(rec -> {
@@ -54,7 +54,7 @@ public final class RowidHelper {
 	 * @param defaultRowid
 	 * @return rowid
 	 */
-	public static String createRowid(Map<Integer, String> source, List<ColumnInfo> columns, List<String> pks,
+	public static String createRowid(Map<Integer, String> source, List<Column> columns, List<String> pks,
 			String defaultRowid) {
 		final List<Integer> pkIndexes = ColumnInfoHelper.primaryKeyIndexes(columns, pks);
 

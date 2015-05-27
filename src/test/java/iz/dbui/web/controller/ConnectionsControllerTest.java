@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 
 /**
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public class ConnectionsControllerTest extends AbstractSpringTest {

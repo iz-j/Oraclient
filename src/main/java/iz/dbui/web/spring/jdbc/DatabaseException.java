@@ -8,7 +8,7 @@ import org.springframework.dao.DataAccessException;
 /**
  * All exceptions related with the database.
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 @SuppressWarnings("serial")

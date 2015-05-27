@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 /**
  * Supports to switch the connection that will be used per thread.
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 @Component

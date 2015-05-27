@@ -1,8 +1,10 @@
 package iz.dbui.web.process.database.dao;
 
 import iz.dbui.web.process.ProcessConstants;
-import iz.dbui.web.process.database.dto.ColumnInfo;
-import iz.dbui.web.process.database.dto.ColumnInfo.DataType;
+import iz.dbui.web.process.database.dto.Column;
+import iz.dbui.web.process.database.dto.Column.DataType;
+import iz.dbui.web.process.database.dto.definition.ColumnInfo;
+import iz.dbui.web.process.database.dto.definition.TableInfo;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -31,14 +33,22 @@ import org.springframework.stereotype.Repository;
 public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 	private static final Logger logger = LoggerFactory.getLogger(DatabaseInfoDaoOracle.class);
 
-	private static final String SEL_ALL_TABLES;
+	private static final String SEL_USR_TABLES;
 	static {
-		SEL_ALL_TABLES = "SELECT * FROM USER_TABLES ORDER BY TABLE_NAME";
+		SEL_USR_TABLES = "SELECT * FROM USER_TABLES ORDER BY TABLE_NAME";
 	}
 
-	private static final String SEL_ALL_TAB_COLUMNS;
+	private static final String SEL_USR_TABLE;
 	static {
-		SEL_ALL_TAB_COLUMNS = "SELECT A.*, B.COMMENTS FROM"
+		SEL_USR_TABLE = "SELECT A.*, B.COMMENTS FROM"
+				+ " USER_TABLES A, USER_TAB_COMMENTS B"
+				+ " WHERE A.TABLE_NAME = B.TABLE_NAME"
+				+ " AND A.TABLE_NAME = ?";
+	}
+
+	private static final String SEL_USR_TAB_COLUMNS;
+	static {
+		SEL_USR_TAB_COLUMNS = "SELECT A.*, B.COMMENTS FROM"
 				+ " USER_TAB_COLUMNS A, USER_COL_COMMENTS B"
 				+ " WHERE A.TABLE_NAME = B.TABLE_NAME"
 				+ " AND A.COLUMN_NAME = B.COLUMN_NAME"
@@ -62,8 +72,8 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 	@Override
 	@Cacheable(value = ProcessConstants.CACHE_DATABASE, key = "#connectionId")
 	public List<String> findAllTableNames(String connectionId) {
-		logger.trace("#findAllTableNames");
-		return jdbc.query(SEL_ALL_TABLES, new RowMapper<String>() {
+		logger.trace("#findAllTableNames @Cacheable");
+		return jdbc.query(SEL_USR_TABLES, new RowMapper<String>() {
 
 			@Override
 			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -73,26 +83,54 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 	}
 
 	@Override
+	public TableInfo findTableBy(String tableName) {
+		logger.trace("#findTableBy");
+		return jdbc.queryForObject(SEL_USR_TABLE, new RowMapper<TableInfo>() {
+
+			@Override
+			public TableInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
+				final TableInfo t = new TableInfo();
+				t.tableName = rs.getString("TABLE_NAME");
+				t.comments = rs.getString("COMMENTS");
+				t.description = makeTableDescription(rs);
+				return t;
+			}
+		}, tableName);
+	}
+
+	private String makeTableDescription(ResultSet rsTblInfo) throws SQLException {
+		return "TABLE SPACE is " + rsTblInfo.getString("TABLESPACE_NAME");
+	}
+
+	@Override
 	@Cacheable(value = ProcessConstants.CACHE_DATABASE, key = "#connectionId.concat(':cols:').concat(#tableName)")
 	public List<ColumnInfo> findColumnsBy(String connectionId, String tableName) {
+		logger.trace("#findColumnsBy @Cacheable");
+		return findColumnsBy(tableName);
+	}
+
+	@Override
+	public List<ColumnInfo> findColumnsBy(String tableName) {
 		logger.trace("#findColumnsBy");
-		return jdbc.query(SEL_ALL_TAB_COLUMNS, new RowMapper<ColumnInfo>() {
+		return jdbc.query(SEL_USR_TAB_COLUMNS, new RowMapper<ColumnInfo>() {
 
 			@Override
 			public ColumnInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
 				final ColumnInfo c = new ColumnInfo();
+				c.description = makeColumnDescription(rs);
+
 				c.tableName = rs.getString("TABLE_NAME");
 				c.columnName = rs.getString("COLUMN_NAME");
 				c.dataType = toDataType(rs.getString("DATA_TYPE"));
 				c.comments = rs.getString("COMMENTS");
+
 				return c;
 			}
 		}, StringUtils.upperCase(tableName));
 	}
 
 	@Override
-	@Cacheable(value = ProcessConstants.CACHE_DATABASE, key = "#connectionId.concat(':pks:').concat(#tableName)")
-	public List<String> findPrimaryKeysBy(String connectionId, String tableName) {
+	public List<String> findPrimaryKeysBy(String tableName) {
 		logger.trace("#findPrimaryKeysBy");
 		return jdbc.query(SEL_PRIMARY_KEYS, new RowMapper<String>() {
 
@@ -125,16 +163,48 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 		}
 	}
 
+	private String makeColumnDescription(ResultSet rsColInfo) throws SQLException {
+		final StringBuilder description = new StringBuilder();
+
+		final String dataDefault = rsColInfo.getString("DATA_DEFAULT");// Read at first to avoid oracle bug spec!
+
+		final String oracleDataType = rsColInfo.getString("DATA_TYPE");
+		description.append(oracleDataType);
+		switch (toDataType(oracleDataType)) {
+		case STRING:
+			description.append("(").append(rsColInfo.getInt("DATA_LENGTH")).append(")");
+			break;
+		case NUMBER:
+			description.append("(").append(rsColInfo.getInt("DATA_PRECISION")).append(",")
+			.append(rsColInfo.getInt("DATA_SCALE")).append(")");
+			break;
+		case DATE:
+		case OTHER:
+		default:
+			break;
+		}
+
+		if ("N".equals(rsColInfo.getString("NULLABLE"))) {
+			description.append(" NOT NULL");
+		}
+
+		if (StringUtils.isNotEmpty(dataDefault)) {
+			description.append(" DEFAULT ").append(dataDefault);
+		}
+
+		return description.toString();
+	}
+
 	@Override
-	public Pair<List<ColumnInfo>, List<List<String>>> executeQuery(String sqlSentence) {
+	public Pair<List<Column>, List<List<String>>> executeQuery(String sqlSentence) {
 		logger.trace("#executeQuery {}", sqlSentence);
 
-		return jdbc.query(sqlSentence, new ResultSetExtractor<Pair<List<ColumnInfo>, List<List<String>>>>() {
+		return jdbc.query(sqlSentence, new ResultSetExtractor<Pair<List<Column>, List<List<String>>>>() {
 
 			@Override
-			public Pair<List<ColumnInfo>, List<List<String>>> extractData(ResultSet rs) throws SQLException,
+			public Pair<List<Column>, List<List<String>>> extractData(ResultSet rs) throws SQLException,
 			DataAccessException {
-				final List<ColumnInfo> columns = new ArrayList<>();
+				final List<Column> columns = new ArrayList<>();
 				final List<List<String>> records = new ArrayList<>();
 
 				final ResultSetMetaData rsmd = rs.getMetaData();
@@ -142,7 +212,7 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 
 				// Extract columns.
 				for (int i = 1; i <= columnCount; i++) {
-					final ColumnInfo c = new ColumnInfo();
+					final Column c = new Column();
 					c.columnName = rsmd.getColumnName(i);
 					switch (rsmd.getColumnType(i)) {
 					case Types.CHAR:
@@ -201,7 +271,7 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 					records.add(values);
 				}
 
-				return new ImmutablePair<List<ColumnInfo>, List<List<String>>>(columns, records);
+				return new ImmutablePair<List<Column>, List<List<String>>>(columns, records);
 			}
 
 		});

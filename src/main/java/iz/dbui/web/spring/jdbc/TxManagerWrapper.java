@@ -10,7 +10,7 @@ import org.springframework.transaction.support.DefaultTransactionStatus;
 /**
  * Just wrapper of {@link DataSourceTransactionManager}.
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 @SuppressWarnings("serial")

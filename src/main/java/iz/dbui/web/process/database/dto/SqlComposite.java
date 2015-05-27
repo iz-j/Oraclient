@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public final class SqlComposite {

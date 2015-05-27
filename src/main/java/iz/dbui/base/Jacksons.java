@@ -11,7 +11,7 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 /**
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public final class Jacksons {

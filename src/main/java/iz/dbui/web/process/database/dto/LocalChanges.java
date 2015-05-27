@@ -11,7 +11,7 @@ public final class LocalChanges {
 	/**
 	 * Column names of table that be edited.
 	 */
-	public List<ColumnInfo> columns;
+	public List<Column> columns;
 	/**
 	 * Edited values.<br>
 	 * [key = rowid for local, value = Map[key = column index, value = new value]]

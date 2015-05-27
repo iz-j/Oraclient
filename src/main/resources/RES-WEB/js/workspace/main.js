@@ -15,6 +15,7 @@ var Workspace = function() {
 
     NamingDialog.init();
     CompositeDialog.init();
+    TableInfoDialog.init(_connectionId);
     SqlList.init();
     SqlEditor.init(_connectionId);
     ProcessorAdaptor.init(_connectionId);

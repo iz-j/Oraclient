@@ -14,7 +14,7 @@ import org.springframework.jdbc.datasource.AbstractDataSource;
 /**
  * This class returns {@link javax.sql.DataSource} by {@link ConnectionContext#getCurrentId()} of current thread.
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public final class DataSourceRouter extends AbstractDataSource {

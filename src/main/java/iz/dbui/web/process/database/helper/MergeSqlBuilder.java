@@ -1,7 +1,7 @@
 package iz.dbui.web.process.database.helper;
 
-import iz.dbui.web.process.database.dto.ColumnInfo;
-import iz.dbui.web.process.database.dto.ColumnInfo.DataType;
+import iz.dbui.web.process.database.dto.Column;
+import iz.dbui.web.process.database.dto.Column.DataType;
 
 import java.util.List;
 import java.util.Map;
@@ -12,7 +12,7 @@ import org.joda.time.DateTime;
 /**
  * TODO Resolve oracle dependencies!
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public final class MergeSqlBuilder {
@@ -26,7 +26,7 @@ public final class MergeSqlBuilder {
 	 * @param columns
 	 * @return INSERT
 	 */
-	public static String insert(Map<Integer, String> source, String tableName, List<ColumnInfo> columns) {
+	public static String insert(Map<Integer, String> source, String tableName, List<Column> columns) {
 		final StringBuilder sql = new StringBuilder();
 		sql.append("INSERT INTO ").append(tableName).append(" (");
 
@@ -65,7 +65,7 @@ public final class MergeSqlBuilder {
 	 * @return UPDATE
 	 */
 	public static String update(List<String> keys, Map<Integer, String> source, String tableName,
-			List<ColumnInfo> columns, List<String> pks) {
+			List<Column> columns, List<String> pks) {
 		final StringBuilder sql = new StringBuilder();
 		sql.append("UPDATE ").append(tableName).append(" SET ");
 
@@ -74,7 +74,7 @@ public final class MergeSqlBuilder {
 			if (before1 < sql.length()) {
 				sql.append(", ");
 			}
-			final ColumnInfo column = columns.get(columnIndex);
+			final Column column = columns.get(columnIndex);
 			sql.append(column.columnName).append(" = ").append(toSqlVal(value, column.dataType));
 		});
 
@@ -90,7 +90,7 @@ public final class MergeSqlBuilder {
 			// keys and pkIndexes are same order!
 			final int columnIndex = pkIndexes.get(keys.indexOf(key));
 
-			final ColumnInfo column = columns.get(columnIndex);
+			final Column column = columns.get(columnIndex);
 			sql.append(column.columnName).append(" = ").append(toSqlVal(key, column.dataType));
 			});
 
@@ -104,7 +104,7 @@ public final class MergeSqlBuilder {
 	 * @param pks
 	 * @return DELETE
 	 */
-	public static String delete(List<String> keys, String tableName, List<ColumnInfo> columns, List<String> pks) {
+	public static String delete(List<String> keys, String tableName, List<Column> columns, List<String> pks) {
 		final StringBuilder sql = new StringBuilder().append("DELETE FROM ").append(tableName).append(" WHERE ");
 
 		final List<Integer> pkIndexes = ColumnInfoHelper.primaryKeyIndexes(columns, pks);
@@ -116,7 +116,7 @@ public final class MergeSqlBuilder {
 
 			final int columnIndex = pkIndexes.get(keys.indexOf(key));
 
-			final ColumnInfo column = columns.get(columnIndex);
+			final Column column = columns.get(columnIndex);
 			sql.append(column.columnName).append(" = ").append(toSqlVal(key, column.dataType));
 		});
 

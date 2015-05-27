@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 @XmlRootElement

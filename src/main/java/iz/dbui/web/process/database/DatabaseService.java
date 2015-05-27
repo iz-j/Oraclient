@@ -3,6 +3,7 @@ package iz.dbui.web.process.database;
 import iz.dbui.web.process.database.dto.ExecutionResult;
 import iz.dbui.web.process.database.dto.LocalChanges;
 import iz.dbui.web.process.database.dto.SqlTemplate;
+import iz.dbui.web.process.database.dto.definition.TableInfo;
 import iz.dbui.web.spring.jdbc.DatabaseException;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
- * @author izumi_j
+ * @author iz_j
  *
  */
 public interface DatabaseService {
@@ -26,4 +27,5 @@ public interface DatabaseService {
 
 	List<String> getSqlCompletions(String term, String tableName);
 
+	TableInfo getTableInfoOf(String tableName);
 }
