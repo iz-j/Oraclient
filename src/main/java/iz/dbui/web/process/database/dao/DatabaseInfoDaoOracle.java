@@ -4,6 +4,9 @@ import iz.dbui.web.process.ProcessConstants;
 import iz.dbui.web.process.database.dto.Column;
 import iz.dbui.web.process.database.dto.Column.DataType;
 import iz.dbui.web.process.database.dto.definition.ColumnInfo;
+import iz.dbui.web.process.database.dto.definition.ForeignKeyInfo;
+import iz.dbui.web.process.database.dto.definition.IndexInfo;
+import iz.dbui.web.process.database.dto.definition.PrimaryKeyInfo;
 import iz.dbui.web.process.database.dto.definition.TableInfo;
 
 import java.sql.ResultSet;
@@ -25,6 +28,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.stereotype.Repository;
@@ -56,14 +60,49 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 				+ " ORDER BY A.COLUMN_ID";
 	}
 
-	private static final String SEL_PRIMARY_KEYS;
+	private static final String SEL_PRIMARY_KEY;
 	static {
-		SEL_PRIMARY_KEYS = "SELECT T.COLUMN_NAME FROM USER_CONS_COLUMNS T"
-				+ " WHERE T.TABLE_NAME = ?"
-				+ " AND T.CONSTRAINT_NAME IN ("
-				+ " SELECT CONSTRAINT_NAME FROM USER_CONSTRAINTS"
-				+ " WHERE TABLE_NAME = T.TABLE_NAME"
-				+ " AND CONSTRAINT_TYPE = 'P')";
+		SEL_PRIMARY_KEY = "SELECT A.CONSTRAINT_NAME, B.COLUMN_NAME"
+				+ " FROM USER_CONSTRAINTS A, USER_CONS_COLUMNS B"
+				+ " WHERE A.TABLE_NAME = ?"
+				+ " AND A.CONSTRAINT_TYPE = 'P'"
+				+ " AND A.OWNER = B.OWNER"
+				+ " AND A.CONSTRAINT_NAME = B.CONSTRAINT_NAME"
+				+ " ORDER BY A.CONSTRAINT_NAME, B.POSITION";
+	}
+
+	private static final String SEL_PRIMARY_KEY_REFERERS;
+	static {
+		SEL_PRIMARY_KEY_REFERERS = "SELECT A.TABLE_NAME"
+				+ " FROM USER_CONSTRAINTS A"
+				+ " WHERE A.R_CONSTRAINT_NAME = ?"
+				+ " AND A.CONSTRAINT_TYPE = 'R'"
+				+ " ORDER BY 1";
+	}
+
+	private static final String SEL_FOREIGN_KEYS;
+	static {
+		SEL_FOREIGN_KEYS = "SELECT A.CONSTRAINT_NAME, B.COLUMN_NAME, C.TABLE_NAME R_TABLE_NAME"
+				+ " FROM USER_CONSTRAINTS A, USER_CONS_COLUMNS B, USER_CONSTRAINTS C"
+				+ " WHERE A.TABLE_NAME = ?"
+				+ " AND A.CONSTRAINT_TYPE = 'R'"
+				+ " AND A.OWNER = B.OWNER"
+				+ " AND A.CONSTRAINT_NAME = B.CONSTRAINT_NAME"
+				+ " AND A.R_OWNER = C.OWNER"
+				+ " AND A.R_CONSTRAINT_NAME = C.CONSTRAINT_NAME"
+				+ " ORDER BY A.CONSTRAINT_NAME, B.POSITION";
+	}
+
+	private static final String SEL_INDEXES;
+	static {
+		SEL_INDEXES = "SELECT A.* FROM USER_IND_COLUMNS A"
+				+ " WHERE A.TABLE_NAME = ?"
+				+ " AND NOT EXISTS"
+				+ " (SELECT * FROM USER_CONSTRAINTS WHERE CONSTRAINT_NAME = A.INDEX_NAME)"
+				+ " ORDER BY A.COLUMN_POSITION";
+	}
+
+	static {
 	}
 
 	@Autowired
@@ -130,13 +169,87 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 	}
 
 	@Override
-	public List<String> findPrimaryKeysBy(String tableName) {
+	public List<String> findPrimaryKeyColumnNamesBy(String tableName) {
 		logger.trace("#findPrimaryKeysBy");
-		return jdbc.query(SEL_PRIMARY_KEYS, new RowMapper<String>() {
+		return jdbc.query(SEL_PRIMARY_KEY, new RowMapper<String>() {
 
 			@Override
 			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-				return rs.getString(1);
+				return rs.getString("COLUMN_NAME");
+			}
+		}, StringUtils.upperCase(tableName));
+	}
+
+	@Override
+	public PrimaryKeyInfo findPrimaryKeyBy(String tableName) {
+		logger.trace("#findPrimaryKeyBy");
+		final PrimaryKeyInfo pk = jdbc.query(SEL_PRIMARY_KEY, new ResultSetExtractor<PrimaryKeyInfo>() {
+
+			@Override
+			public PrimaryKeyInfo extractData(ResultSet rs) throws SQLException {
+				final PrimaryKeyInfo pk = new PrimaryKeyInfo();
+				pk.columns = new ArrayList<>();
+				while (rs.next()) {
+					pk.name = rs.getString("CONSTRAINT_NAME");
+					pk.columns.add(rs.getString("COLUMN_NAME"));
+				}
+				return pk;
+			}
+		}, StringUtils.upperCase(tableName));
+
+		pk.referers = new ArrayList<>();
+		jdbc.query(SEL_PRIMARY_KEY_REFERERS, new RowCallbackHandler() {
+
+			@Override
+			public void processRow(ResultSet rs) throws SQLException {
+				pk.referers.add(rs.getString("TABLE_NAME"));
+			}
+		}, pk.name);
+
+		return pk;
+	}
+
+	@Override
+	public List<ForeignKeyInfo> findForeignKeysBy(String tableName) {
+		return jdbc.query(SEL_FOREIGN_KEYS, new ResultSetExtractor<List<ForeignKeyInfo>>() {
+
+			@Override
+			public List<ForeignKeyInfo> extractData(ResultSet rs) throws SQLException {
+				final List<ForeignKeyInfo> fks = new ArrayList<>();
+				ForeignKeyInfo fk = null;
+				while (rs.next()) {
+					if (fk == null || !StringUtils.equals(fk.name, rs.getString("CONSTRAINT_NAME"))) {
+						fk = new ForeignKeyInfo();
+						fk.columns = new ArrayList<>();
+						fks.add(fk);
+						fk.name = rs.getString("CONSTRAINT_NAME");
+						fk.reference = rs.getString("R_TABLE_NAME");
+					}
+					fk.columns.add(rs.getString("COLUMN_NAME"));
+				}
+				return fks;
+			}
+		}, StringUtils.upperCase(tableName));
+	}
+
+	@Override
+	public List<IndexInfo> findIndexesBy(String tableName) {
+		return jdbc.query(SEL_INDEXES, new ResultSetExtractor<List<IndexInfo>>() {
+
+			@Override
+			public List<IndexInfo> extractData(ResultSet rs) throws SQLException {
+				final List<IndexInfo> idxs = new ArrayList<>();
+				IndexInfo idx = null;
+				while (rs.next()) {
+					if (idx == null || !StringUtils.equals(idx.name, rs.getString("INDEX_NAME"))) {
+						idx = new IndexInfo();
+						idx.columns = new ArrayList<>();
+						idxs.add(idx);
+						idx.name = rs.getString("INDEX_NAME");
+					}
+					idx.columns.add(rs.getString("COLUMN_NAME"));
+				}
+				return idxs;
 			}
 		}, StringUtils.upperCase(tableName));
 	}
@@ -176,7 +289,7 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 			break;
 		case NUMBER:
 			description.append("(").append(rsColInfo.getInt("DATA_PRECISION")).append(",")
-			.append(rsColInfo.getInt("DATA_SCALE")).append(")");
+					.append(rsColInfo.getInt("DATA_SCALE")).append(")");
 			break;
 		case DATE:
 		case OTHER:
@@ -203,7 +316,7 @@ public class DatabaseInfoDaoOracle implements DatabaseInfoDao {
 
 			@Override
 			public Pair<List<Column>, List<List<String>>> extractData(ResultSet rs) throws SQLException,
-			DataAccessException {
+					DataAccessException {
 				final List<Column> columns = new ArrayList<>();
 				final List<List<String>> records = new ArrayList<>();
 

@@ -19,3 +19,8 @@ body {
   display: inline-block;
   margin: auto;
 }
+
+/* Bootstrap bug??? */
+.modal-backdrop {
+  height: 100%;
+}

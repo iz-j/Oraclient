@@ -100,7 +100,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 				// Determine editable or not.
 				List<String> pks = null;
 				if (sql.type == TemplateType.TABLE) {
-					pks = dbDao.findPrimaryKeysBy(sql.tableName);
+					pks = dbDao.findPrimaryKeyColumnNamesBy(sql.tableName);
 					result.tableName = sql.tableName;
 					result.editable = ColumnInfoHelper.containsAll(result.columns, pks);
 					logger.trace("editable = {}", result.editable);
@@ -135,7 +135,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 			final String tableName = changes.tableName;
 			final List<Column> columns = changes.columns;
 
-			final List<String> pks = dbDao.findPrimaryKeysBy(changes.tableName);
+			final List<String> pks = dbDao.findPrimaryKeyColumnNamesBy(changes.tableName);
 
 			// Handle insert and update.
 			changes.editedMap.forEach((rowid, values) -> {
@@ -150,8 +150,8 @@ public class DatabaseServiceImpl implements DatabaseService {
 				dbDao.executeUpdate(sql);
 
 				// Set new rowid for client.
-					retval.put(rowid, RowidHelper.createRowid(values, columns, pks, rowid));
-				});
+				retval.put(rowid, RowidHelper.createRowid(values, columns, pks, rowid));
+			});
 
 			// Handle delete.
 			changes.removedRowids.forEach(rowid -> {
@@ -208,11 +208,14 @@ public class DatabaseServiceImpl implements DatabaseService {
 	@Override
 	public TableInfo getTableInfoOf(String tableName) {
 		final TableInfo t = dbDao.findTableBy(tableName);
-		t.columns = dbDao.findColumnsBy(tableName);
 
-		final List<String> pks = dbDao.findPrimaryKeysBy(tableName);
+		t.columns = dbDao.findColumnsBy(tableName);
+		t.primaryKey = dbDao.findPrimaryKeyBy(tableName);
+		t.foreignKeys = dbDao.findForeignKeysBy(tableName);
+		t.indexes = dbDao.findIndexesBy(tableName);
+
 		t.columns.forEach(c -> {
-			c.isKey = pks.indexOf(c.columnName) > -1;
+			c.isKey = t.primaryKey.columns.indexOf(c.columnName) > -1;
 		});
 
 		return t;

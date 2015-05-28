@@ -2,6 +2,9 @@ package iz.dbui.web.process.database.dao;
 
 import iz.dbui.web.process.database.dto.Column;
 import iz.dbui.web.process.database.dto.definition.ColumnInfo;
+import iz.dbui.web.process.database.dto.definition.ForeignKeyInfo;
+import iz.dbui.web.process.database.dto.definition.IndexInfo;
+import iz.dbui.web.process.database.dto.definition.PrimaryKeyInfo;
 import iz.dbui.web.process.database.dto.definition.TableInfo;
 
 import java.util.List;
@@ -25,7 +28,7 @@ public interface DatabaseInfoDao {
 
 	/**
 	 * @param tableName
-	 * @return table info without column infos
+	 * @return table info without columns, primary key, index, foreign key
 	 */
 	TableInfo findTableBy(String tableName);
 
@@ -45,9 +48,27 @@ public interface DatabaseInfoDao {
 
 	/**
 	 * @param tableName
-	 * @return primary key names
+	 * @return primary key column names
 	 */
-	List<String> findPrimaryKeysBy(String tableName);
+	List<String> findPrimaryKeyColumnNamesBy(String tableName);
+
+	/**
+	 * @param tableName
+	 * @return primary key info
+	 */
+	PrimaryKeyInfo findPrimaryKeyBy(String tableName);
+
+	/**
+	 * @param tableName
+	 * @return foreign key infos
+	 */
+	List<ForeignKeyInfo> findForeignKeysBy(String tableName);
+
+	/**
+	 * @param tableName
+	 * @return index infos
+	 */
+	List<IndexInfo> findIndexesBy(String tableName);
 
 	/**
 	 * @param sqlSentence

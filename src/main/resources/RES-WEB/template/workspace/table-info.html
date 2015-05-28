@@ -32,10 +32,61 @@
       </table>
     </div>
 
-    <div class="tab-pane" id="table-info-constraints"></div>
+    <div class="tab-pane" id="table-info-constraints">
+      <p th:if="${#strings.isEmpty(tableInfo.primaryKey.name)}">
+        No primary key!
+      </p>
+      <div th:if="${!#strings.isEmpty(tableInfo.primaryKey.name)}">
+        <h3>
+          <span class="label label-info">PK</span>
+          <span th:text="${tableInfo.primaryKey.name}"></span>
+        </h3>
+        <div>
+          <u>Columns</u>
+          <ol>
+            <li th:each="c : ${tableInfo.primaryKey.columns}" th:text="${c}"></li>
+          </ol>
+        </div>
+        <div th:if="${tableInfo.primaryKey.referers.size() > 0}">
+          <u>Referers</u>
+          <ul>
+            <li th:each="r : ${tableInfo.primaryKey.referers}" th:text="${r}"></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div th:each="fk : ${tableInfo.foreignKeys}">
+        <h3>
+          <span class="label label-default">FK</span>
+          <span th:text="${fk.name}"></span>
+        </h3>
+        <div>
+          <u>Columns</u>
+          <ol>
+            <li th:each="c : ${fk.columns}" th:text="${c}"></li>
+          </ol>
+        </div>
+        <div>
+          <span>Reference to </span><b th:text="${fk.reference}"></b>
+        </div>
+      </div>
+    </div>
 
     <div class="tab-pane" id="table-info-others">
       <p th:text="${tableInfo.description}"></p>
+      
+      <div th:each="idx : ${tableInfo.indexes}">
+        <h3>
+          <span class="label label-default">INDEX</span>
+          <span th:text="${idx.name}"></span>
+        </h3>
+        <div>
+          <u>Columns</u>
+          <ol>
+            <li th:each="c : ${idx.columns}" th:text="${c}"></li>
+          </ol>
+        </div>
+      </div>
     </div>
   </div>
 </div>
