@@ -28,7 +28,7 @@ public class ConnectionsController {
 		return mv;
 	}
 
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	@RequestMapping(value = "/list", method = RequestMethod.POST)
 	public ModelAndView getConnections() {
 		logger.trace("#getConnections");
 		final ModelAndView mv = new ModelAndView("connections/list");

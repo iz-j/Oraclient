@@ -62,14 +62,14 @@ var ConnectionDialog = function() {
           required: true
         },
         'host': {
-          required: true
+          required: false
         },
         'port': {
-          required: true,
+          required: false,
           number: true
         },
         'sid': {
-          required: true
+          required: false
         },
         'username': {
           required: true

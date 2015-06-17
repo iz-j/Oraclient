@@ -3,13 +3,18 @@ $(function() {
   ConnectionDialog.init();
 
   // Load connection list.
-  $.ajax({
-    url: '/connections/list',
-    dataType: 'html'
-  }).done(function(res) {
-    ConnectionList.setContent(res);
-  });
-
+  var load = function() {
+    $.ajax({
+      url: '/connections/list',
+      type: 'post',
+      dataType: 'html'
+    }).done(function(res) {
+      ConnectionList.setContent(res);
+    });
+  };
+  load();
+  
+  
   // Post new connection.
   ConnectionDialog.setOnPost(function(data) {
     $.ajax({
@@ -41,5 +46,9 @@ $(function() {
   // Others
   $('#btn-new').on('click', function() {
     ConnectionDialog.show();
+  });
+  
+  $('#btn-refresh').on('click', function() {
+    load();
   });
 });

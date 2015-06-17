@@ -7,10 +7,14 @@
 <div th:fragment="content">
   <!-- Connection List -->
   <div class="row">
-    <div class="col-lg-6 col-lg-offset-3">
+    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-sm-12">
       <div class="block">
         <div class="block-title">
           <div class="block-options pull-right">
+            <a id="btn-refresh" href="javascript:void(0)" class="btn btn-effect-ripple btn-primary"
+              data-toggle="tooltip" data-placement="left" title="" data-original-title="Refresh">
+                <i class="fa fa-refresh"></i>
+            </a>
             <a id="btn-new" href="javascript:void(0)" class="btn btn-effect-ripple btn-primary"
               data-toggle="tooltip" data-placement="left" title="" data-original-title="Create new connection">
                 <i class="fa fa-plus"></i>
@@ -28,6 +32,7 @@
                 <th>Sid</th>
                 <th>Username</th>
                 <th>Password</th>
+                <th>FreeFormat URL</th>
                 <th style="width: 80px;" class="text-center"><i class="fa fa-bolt"></i></th>
               </tr>
             </thead>
@@ -85,6 +90,12 @@
               <label class="col-md-3 control-label" for="password">Password</label>
               <div class="col-md-9">
                 <input type="text" id="password" name="password" class="form-control" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-3 control-label" for="freeFormat">Free format URL</label>
+              <div class="col-md-9">
+                <textarea id="freeFormat" name="freeFormat" class="form-control" />
               </div>
             </div>
           </form>

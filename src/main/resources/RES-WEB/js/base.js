@@ -69,6 +69,8 @@ $(function() {
   }).on('ajaxStop', function() {
     // Unbind event to abort xhr when all ajax has been completed.
     $(window).off('beforeunload.Base');
+  }).on('ajaxError', function(event, xhr, options, error) {
+    Base.growl('Ajax failed! ' + error, 'danger');
   });
 
   $('#cancel-request').on('click', function() {

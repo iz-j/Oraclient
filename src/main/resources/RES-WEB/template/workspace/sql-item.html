@@ -1,4 +1,4 @@
-<div class="col-lg-3 col-sm-4 sql-item-root" th:each="sql : ${sqls}">
+<div class="col-lg-3 col-md-3 col-sm-4 sql-item-root" th:each="sql : ${sqls}">
   <a href="javascript:void(0)" class="widget sql-item" th:id="'sql-' + ${sql.id}"
     th:title="${sql.name}"
     th:attr="data-id=${sql.id},data-type=${sql.type},data-table-name=${sql.tableName}">

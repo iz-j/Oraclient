@@ -83,7 +83,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 		final Connection c = get(id);
 
 		if (dataSource instanceof DataSourceRouter) {
-			((DataSourceRouter)dataSource).addNewConnection(c.id, c.host, c.port, c.sid, c.username, c.password);
+			((DataSourceRouter) dataSource).addNewConnection(c);
 		} else {
 			throw new IllegalStateException("DataSource must be DataSourceRouter!");
 		}

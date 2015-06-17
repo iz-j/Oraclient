@@ -25,28 +25,23 @@ public final class DataSourceRouter extends AbstractDataSource {
 	/**
 	 * Add new connection.
 	 *
-	 * @param id
-	 * @param host
-	 * @param port
-	 * @param sid
-	 * @param username
-	 * @param password
+	 * @param connectionInfo
 	 * @throws DatabaseException
 	 */
-	public void addNewConnection(String id, String host, int port, String sid, String username, String password)
+	public void addNewConnection(JdbcConnectionInfo connectionInfo)
 			throws DatabaseException {
-		final String url = "jdbc:oracle:thin:@" + host + ":" + port + ":" + sid;
+		final String url = connectionInfo.getOracleUrl();
 
-		if (targetDataSources.containsKey(id)) {
-			logger.debug("DataSource for {}({}) has already been created.", id, url);
+		if (targetDataSources.containsKey(connectionInfo.getId())) {
+			logger.debug("DataSource for {}({}) has already been created.", connectionInfo.getId(), url);
 			return;
 		}
 
 		final org.apache.tomcat.jdbc.pool.DataSource ds = new org.apache.tomcat.jdbc.pool.DataSource();
 		ds.setDriverClassName("oracle.jdbc.OracleDriver");
 		ds.setUrl(url);
-		ds.setUsername(username);
-		ds.setPassword(password);
+		ds.setUsername(connectionInfo.getUsername());
+		ds.setPassword(connectionInfo.getPassword());
 
 		ds.setDefaultAutoCommit(false);
 		ds.setInitialSize(1);
@@ -68,8 +63,9 @@ public final class DataSourceRouter extends AbstractDataSource {
 			throw new DatabaseException("Could not connect to [" + url + "] !", e);
 		}
 
-		targetDataSources.put(id, ds);
-		logger.debug("New connection created. {} {}/{}", url, username, password);
+		targetDataSources.put(connectionInfo.getId(), ds);
+		logger.debug("New connection created. {} {}/{}", url, connectionInfo.getUsername(),
+				connectionInfo.getPassword());
 	}
 
 	@Override

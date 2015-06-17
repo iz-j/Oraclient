@@ -55,8 +55,7 @@ abstract public class AbstractSpringTest {
 		connectionService.add(connection);
 
 		final DataSourceRouter ds = (DataSourceRouter) dataSource;
-		ds.addNewConnection(connection.id, connection.host, connection.port, connection.sid, connection.username,
-				connection.password);
+		ds.addNewConnection(connection);
 		ConnectionContext.setId(connection.id);
 
 		logger.info("------------------------------ Start test! ------------------------------");
